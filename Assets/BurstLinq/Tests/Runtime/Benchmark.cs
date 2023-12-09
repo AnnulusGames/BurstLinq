@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Unity.PerformanceTesting;
@@ -7,12 +8,12 @@ using Unity.PerformanceTesting;
 
 namespace BurstLinq.Tests
 {
-    public class BenchmarkIntSum
+    public class BenchmarkFloatSum
     {
         const int WarmupCount = 5;
         const int MeasurementCount = 100;
 
-        static readonly int[] array = Enumerable.Range(0, 10000).ToArray();
+        static readonly float[] array = Enumerable.Repeat(1.0f, 10000).ToArray();
 
         [TearDown]
         public void TearDown()
@@ -25,7 +26,7 @@ namespace BurstLinq.Tests
         {
             Measure.Method(() =>
             {
-                var result = 0;
+                var result = 0.0f;
                 for (int i = 0; i < array.Length; i++)
                 {
                     result += array[i];
@@ -33,7 +34,7 @@ namespace BurstLinq.Tests
             })
             .WarmupCount(WarmupCount)
             .MeasurementCount(MeasurementCount)
-            .SampleGroup(new SampleGroup("Int Sum: For", SampleUnit.Microsecond))
+            .SampleGroup(new SampleGroup("Float Sum: For", SampleUnit.Microsecond))
             .Run();
         }
 
@@ -46,7 +47,7 @@ namespace BurstLinq.Tests
             })
             .WarmupCount(WarmupCount)
             .MeasurementCount(MeasurementCount)
-            .SampleGroup(new SampleGroup("Int Sum: LINQ", SampleUnit.Microsecond))
+            .SampleGroup(new SampleGroup("Float Sum: LINQ", SampleUnit.Microsecond))
             .Run();
         }
 
@@ -59,7 +60,7 @@ namespace BurstLinq.Tests
             })
             .WarmupCount(WarmupCount)
             .MeasurementCount(MeasurementCount)
-            .SampleGroup(new SampleGroup("Int Sum: BurstLinq", SampleUnit.Microsecond))
+            .SampleGroup(new SampleGroup("Float Sum: BurstLinq", SampleUnit.Microsecond))
             .Run();
         }
     }
@@ -132,12 +133,17 @@ namespace BurstLinq.Tests
         }
     }
 
-    public class BenchmarkIntMinEqual
+    public class BenchmarkDoubleMinEqual
     {
         const int WarmupCount = 5;
         const int MeasurementCount = 100;
 
-        static readonly int[] array = Enumerable.Range(0, 10000).ToArray();
+        static readonly double[] array = DoubleRange(10000).ToArray();
+        static IEnumerable<double> DoubleRange(int count)
+        {
+            var current = 0.0;
+            for (int i = 0; i < count; i++) yield return current++;
+        }
 
         [TearDown]
         public void TearDown()
@@ -150,7 +156,7 @@ namespace BurstLinq.Tests
         {
             Measure.Method(() =>
             {
-                var result = int.MaxValue;
+                var result = double.MaxValue;
                 for (int i = 0; i < array.Length; i++)
                 {
                     if (array[i] < result) result = array[i];
