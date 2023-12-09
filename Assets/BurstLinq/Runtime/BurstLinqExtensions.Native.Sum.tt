@@ -48,7 +48,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(<#=type#>* ptr, [AssumeRange(1, int.MaxValue)] int length, out <#=type#> result)
         {
             result = default;

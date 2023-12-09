@@ -30,7 +30,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(int* ptr, [AssumeRange(1, int.MaxValue)] int length, out int result)
         {
             result = default;
@@ -58,7 +58,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(uint* ptr, [AssumeRange(1, int.MaxValue)] int length, out uint result)
         {
             result = default;
@@ -86,7 +86,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(long* ptr, [AssumeRange(1, int.MaxValue)] int length, out long result)
         {
             result = default;
@@ -114,7 +114,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(ulong* ptr, [AssumeRange(1, int.MaxValue)] int length, out ulong result)
         {
             result = default;
@@ -142,7 +142,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(float* ptr, [AssumeRange(1, int.MaxValue)] int length, out float result)
         {
             result = default;
@@ -170,7 +170,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(double* ptr, [AssumeRange(1, int.MaxValue)] int length, out double result)
         {
             result = default;
@@ -198,7 +198,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(Vector2* ptr, [AssumeRange(1, int.MaxValue)] int length, out Vector2 result)
         {
             result = default;
@@ -226,7 +226,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(Vector2Int* ptr, [AssumeRange(1, int.MaxValue)] int length, out Vector2Int result)
         {
             result = default;
@@ -254,7 +254,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(Vector3* ptr, [AssumeRange(1, int.MaxValue)] int length, out Vector3 result)
         {
             result = default;
@@ -282,7 +282,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(Vector3Int* ptr, [AssumeRange(1, int.MaxValue)] int length, out Vector3Int result)
         {
             result = default;
@@ -310,7 +310,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(Vector4* ptr, [AssumeRange(1, int.MaxValue)] int length, out Vector4 result)
         {
             result = default;
@@ -338,7 +338,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(int2* ptr, [AssumeRange(1, int.MaxValue)] int length, out int2 result)
         {
             result = default;
@@ -366,7 +366,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(int3* ptr, [AssumeRange(1, int.MaxValue)] int length, out int3 result)
         {
             result = default;
@@ -394,7 +394,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(int4* ptr, [AssumeRange(1, int.MaxValue)] int length, out int4 result)
         {
             result = default;
@@ -422,7 +422,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(uint2* ptr, [AssumeRange(1, int.MaxValue)] int length, out uint2 result)
         {
             result = default;
@@ -450,7 +450,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(uint3* ptr, [AssumeRange(1, int.MaxValue)] int length, out uint3 result)
         {
             result = default;
@@ -478,7 +478,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(uint4* ptr, [AssumeRange(1, int.MaxValue)] int length, out uint4 result)
         {
             result = default;
@@ -506,7 +506,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(float2* ptr, [AssumeRange(1, int.MaxValue)] int length, out float2 result)
         {
             result = default;
@@ -534,7 +534,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(float3* ptr, [AssumeRange(1, int.MaxValue)] int length, out float3 result)
         {
             result = default;
@@ -562,7 +562,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(float4* ptr, [AssumeRange(1, int.MaxValue)] int length, out float4 result)
         {
             result = default;
@@ -590,7 +590,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(double2* ptr, [AssumeRange(1, int.MaxValue)] int length, out double2 result)
         {
             result = default;
@@ -618,7 +618,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(double3* ptr, [AssumeRange(1, int.MaxValue)] int length, out double3 result)
         {
             result = default;
@@ -646,7 +646,7 @@ namespace BurstLinq
             return result;
         }
 
-        [BurstCompile]
+        [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(double4* ptr, [AssumeRange(1, int.MaxValue)] int length, out double4 result)
         {
             result = default;
