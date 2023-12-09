@@ -1,0 +1,83 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#
+    var types = new string[]
+    {
+        "int", "uint", "long", "ulong", "float", "double",
+        "Vector2", "Vector2Int", "Vector3", "Vector3Int", "Vector4",
+        "int2", "int3", "int4",
+        "float2", "float3", "float4",
+        "double2", "double3", "double4",
+    };
+    
+    System.Func<string, string> retType = (string x) => 
+    {
+        switch (x)
+        {
+            default: return "double";
+            case "float": return "float";
+            case "Vector2":
+            case "Vector2Int": return "Vector2";
+            case "Vector3":
+            case "Vector3Int": return "Vector3";
+            case "Vector4": return "Vector4";
+            case "float2": return "float2";
+            case "float3": return "float3";
+            case "float4": return "float4";
+            case "int2":
+            case "double2": return "double2";
+            case "int3":
+            case "double3": return "double3";
+            case "int4":
+            case "double4": return "double4";
+        }
+        return "";
+    };
+#>
+using Unity.Burst;
+using Unity.Burst.CompilerServices;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
+using Unity.Mathematics;
+using UnityEngine;
+
+namespace BurstLinq
+{
+    public unsafe static partial class BurstLinqExtensions
+    {
+<# foreach(var type in types) { #>
+        public static <#=retType(type)#> Average(this NativeList<<#=type#>> source)
+        {
+            Error.ThrowIfEmpty(source.Length);
+            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            return result;
+        }
+
+        public static <#=retType(type)#> Average(this NativeSlice<<#=type#>> source)
+        {
+            Error.ThrowIfEmpty(source.Length);
+            AverageCore((<#=type#>*)source.GetUnsafePtr(), source.Length, out var result);
+            return result;
+        }
+
+        public static <#=retType(type)#> Average(this NativeArray<<#=type#>> source)
+        {
+            Error.ThrowIfEmpty(source.Length);
+            AverageCore((<#=type#>*)source.GetUnsafePtr(), source.Length, out var result);
+            return result;
+        }
+        
+        [BurstCompile]
+        internal static void AverageCore(<#=type#>* ptr, [AssumeRange(1, int.MaxValue)] int length, out <#=retType(type)#> result)
+        {
+            SumCore(ptr, length, out var sum);
+            result = (<#=retType(type)#>)sum / length;
+        }
+
+<# } #>
+    }
+}

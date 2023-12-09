@@ -1,0 +1,104 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#
+    var types = new string[]
+    {
+        "int", "uint", "long", "ulong", "float", "double",
+        "Vector2", "Vector2Int", "Vector3", "Vector3Int", "Vector4",
+        "int2", "int3", "int4",
+        "float2", "float3", "float4",
+        "double2", "double3", "double4",
+    };
+    
+    System.Func<string, string> retType = (string x) => 
+    {
+        switch (x)
+        {
+            default: return "double";
+            case "float": return "float";
+            case "Vector2":
+            case "Vector2Int": return "Vector2";
+            case "Vector3":
+            case "Vector3Int": return "Vector3";
+            case "Vector4": return "Vector4";
+            case "float2": return "float2";
+            case "float3": return "float3";
+            case "float4": return "float4";
+            case "int2":
+            case "double2": return "double2";
+            case "int3":
+            case "double3": return "double3";
+            case "int4":
+            case "double4": return "double4";
+        }
+        return "";
+    };
+#>
+using System;
+using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Mathematics;
+using UnityEngine;
+
+namespace BurstLinq
+{
+    public unsafe static partial class BurstLinqExtensions
+    {
+<# foreach(var type in types) { #>
+        public static <#=retType(type)#> Average(this <#=type#>[] source)
+        {
+            Error.ThrowIfNull(source);
+            Error.ThrowIfEmpty(source.Length);
+            
+            fixed (<#=type#>* ptr = source)
+            {
+                AverageCore(ptr, source.Length, out var result);
+                return result;
+            }
+        }
+
+        public static <#=retType(type)#> Average(this List<<#=type#>> source)
+        {
+            Error.ThrowIfNull(source);
+            Error.ThrowIfEmpty(source.Count);
+
+            var span = SpanHelper.AsSpan(source);
+            fixed (<#=type#>* ptr = span)
+            {
+                AverageCore(ptr, source.Count, out var result);
+                return result;
+            }
+        }
+
+        public static <#=retType(type)#> Average(this Memory<<#=type#>> source)
+        {
+            return Average((ReadOnlySpan<<#=type#>>)source.Span);
+        }
+
+        public static <#=retType(type)#> Average(this ReadOnlyMemory<<#=type#>> source)
+        {
+            return Average(source.Span);
+        }
+
+        public static <#=retType(type)#>  Average(this Span<<#=type#>> source)
+        {
+            return Average((ReadOnlySpan<<#=type#>>)source);
+        }
+
+        public static <#=retType(type)#>  Average(this ReadOnlySpan<<#=type#>> source)
+        {
+            Error.ThrowIfEmpty(source.IsEmpty);
+
+            fixed (<#=type#>* ptr = source)
+            {
+                AverageCore(ptr, source.Length, out var result);
+                return result;
+            }
+        }
+<# } #>
+    }
+}

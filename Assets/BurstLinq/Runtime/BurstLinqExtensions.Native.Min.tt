@@ -1,0 +1,56 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#
+    var types = new string[]
+    {
+        "byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", "float", "double"
+    };
+#>
+using Unity.Burst;
+using Unity.Burst.CompilerServices;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
+
+namespace BurstLinq
+{
+    public unsafe static partial class BurstLinqExtensions
+    {
+<# foreach(var type in types) { #>
+        public static <#=type#> Min(this NativeList<<#=type#>> source)
+        {
+            Error.ThrowIfEmpty(source.Length);
+            MinCore(source.GetUnsafePtr(), source.Length, out var result);
+            return result;
+        }
+
+        public static <#=type#> Min(this NativeSlice<<#=type#>> source)
+        {
+            Error.ThrowIfEmpty(source.Length);
+            MinCore((<#=type#>*)source.GetUnsafePtr(), source.Length, out var result);
+            return result;
+        }
+
+        public static <#=type#> Min(this NativeArray<<#=type#>> source)
+        {
+            Error.ThrowIfEmpty(source.Length);
+            MinCore((<#=type#>*)source.GetUnsafePtr(), source.Length, out var result);
+            return result;
+        }
+
+        [BurstCompile]
+        internal static void MinCore(<#=type#>* ptr, [AssumeRange(1, int.MaxValue)] int length, out <#=type#> result)
+        {
+            result = <#=type#>.MaxValue;
+            for (int i = 0; i < length; i++)
+            {
+                if (result > ptr[i]) result = ptr[i];
+            }
+        }
+
+<# } #>
+    }
+}

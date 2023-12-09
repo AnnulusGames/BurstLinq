@@ -1,0 +1,11 @@
+{
+    "name": "com.annulusgames.burst-linq",
+    "version": "1.0.0",
+    "displayName": "Burst Linq",
+    "description": "Extremely fast LINQ aggregation operations implementation optimized by Burst Compiler",
+    "unity": "2020.1",
+    "author": {
+        "name": "Annulus Games",
+        "url": "https://github.com/AnnulusGames"
+    }
+}

@@ -1,0 +1,77 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#
+    var types = new string[]
+    {
+        "byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", "float", "double",
+        "Vector2", "Vector2Int", "Vector3", "Vector3Int", "Vector4",
+        "int2", "int3", "int4",
+        "uint2", "uint3", "uint4",
+        "float2", "float3", "float4",
+        "double2", "double3", "double4",
+    };
+#>
+using System;
+using System.Collections.Generic;
+using Unity.Mathematics;
+using UnityEngine;
+
+namespace BurstLinq
+{
+    public unsafe static partial class BurstLinqExtensions
+    {
+<# foreach(var type in types) { #>
+        public static bool Contains(this <#=type#>[] source, <#=type#> value)
+        {
+            Error.ThrowIfNull(source);
+            if (source.Length == 0) return false;
+
+            fixed (<#=type#>* ptr = source)
+            {
+                return ContainsCore(ptr, source.Length, value);
+            }
+        }
+
+        public static bool Contains(this List<<#=type#>> source, <#=type#> value)
+        {
+            Error.ThrowIfNull(source);
+            if (source.Count == 0) return false;
+
+            var span = SpanHelper.AsSpan(source);
+            fixed (<#=type#>* ptr = span)
+            {
+                return ContainsCore(ptr, source.Count, value);
+            }
+        }
+
+        public static bool Contains(this Memory<<#=type#>> source, <#=type#> value)
+        {
+            return Contains((ReadOnlySpan<<#=type#>>)source.Span, value);
+        }
+
+        public static bool Contains(this ReadOnlyMemory<<#=type#>> source, <#=type#> value)
+        {
+            return Contains(source.Span, value);
+        }
+
+        public static bool Contains(this Span<<#=type#>> source, <#=type#> value)
+        {
+            return Contains((ReadOnlySpan<<#=type#>>)source, value);
+        }
+
+        public static bool Contains(this ReadOnlySpan<<#=type#>> source, <#=type#> value)
+        {
+            if (source.IsEmpty) return false;
+
+            fixed (<#=type#>* ptr = source)
+            {
+                return ContainsCore(ptr, source.Length, value);
+            }
+        }
+<# } #>
+    }
+}

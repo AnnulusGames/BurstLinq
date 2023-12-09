@@ -1,0 +1,168 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#
+    var types = new string[]
+    {
+        "byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", "float", "double",
+        "Vector2", "Vector2Int", "Vector3", "Vector3Int", "Vector4",
+        "int2", "int3", "int4",
+        "uint2", "uint3", "uint4",
+        "float2", "float3", "float4",
+        "double2", "double3", "double4",
+    };
+#>
+using System;
+using System.Collections.Generic;
+using Unity.Mathematics;
+using UnityEngine;
+
+namespace BurstLinq
+{
+    public unsafe static partial class BurstLinqExtensions
+    {
+<# foreach(var type in types) { #>
+        public static bool SequenceEqual(this <#=type#>[] first, <#=type#>[] second)
+        {
+            Error.ThrowIfNull(first);
+            Error.ThrowIfNull(second);
+            
+            if (first == second) return true;
+            if (first.Length != second.Length) return false;
+
+            fixed (<#=type#>* firstPtr = first, secondPtr = second)
+            {
+                return SequenceEqualCore(firstPtr, secondPtr, first.Length);
+            }
+        }
+
+        public static bool SequenceEqual(this <#=type#>[] first, List<<#=type#>> second)
+        {
+            Error.ThrowIfNull(first);
+            Error.ThrowIfNull(second);
+            
+            if (first.Length != second.Count) return false;
+
+            var secondSpan = SpanHelper.AsSpan(second);
+            fixed (<#=type#>* firstPtr = first, secondPtr = secondSpan)
+            {
+                return SequenceEqualCore(firstPtr, secondPtr, first.Length);
+            }
+        }
+
+        public static bool SequenceEqual(this <#=type#>[] first, Memory<<#=type#>> second)
+        {
+            return SequenceEqual(first, (ReadOnlySpan<<#=type#>>)second.Span);
+        }
+
+        public static bool SequenceEqual(this <#=type#>[] first, ReadOnlyMemory<<#=type#>> second)
+        {
+            return SequenceEqual(first, second.Span);
+        }
+
+        public static bool SequenceEqual(this <#=type#>[] first, Span<<#=type#>> second)
+        {
+            return SequenceEqual(first, (ReadOnlySpan<<#=type#>>)second);
+        }
+
+        public static bool SequenceEqual(this <#=type#>[] first, ReadOnlySpan<<#=type#>> second)
+        {
+            Error.ThrowIfNull(first);
+
+            if (first.Length != second.Length) return false;
+
+            fixed (<#=type#>* firstPtr = first, secondPtr = second)
+            {
+                return SequenceEqualCore(firstPtr, secondPtr, first.Length);
+            }
+        }
+
+        public static bool SequenceEqual(this List<<#=type#>> first, <#=type#>[] second)
+        {
+            return SequenceEqual(second, first);
+        }
+
+        public static bool SequenceEqual(this List<<#=type#>> first, List<<#=type#>> second)
+        {
+            Error.ThrowIfNull(first);
+            Error.ThrowIfNull(second);
+            
+            if (first == second) return true;
+            if (first.Count != second.Count) return false;
+
+            var firstSpan = SpanHelper.AsSpan(first);
+            var secondSpan = SpanHelper.AsSpan(second);
+            fixed (<#=type#>* firstPtr = firstSpan, secondPtr = secondSpan)
+            {
+                return SequenceEqualCore(firstPtr, secondPtr, first.Count);
+            }
+        }
+
+        public static bool SequenceEqual(this List<<#=type#>> first, Memory<<#=type#>> second)
+        {
+            return SequenceEqual(first, (ReadOnlySpan<<#=type#>>)second.Span);
+        }
+
+        public static bool SequenceEqual(this List<<#=type#>> first, ReadOnlyMemory<<#=type#>> second)
+        {
+            return SequenceEqual(first, second.Span);
+        }
+
+        public static bool SequenceEqual(this List<<#=type#>> first, Span<<#=type#>> second)
+        {
+            return SequenceEqual(first, (ReadOnlySpan<<#=type#>>)second);
+        }
+
+        public static bool SequenceEqual(this List<<#=type#>> first, ReadOnlySpan<<#=type#>> second)
+        {
+            Error.ThrowIfNull(first);
+
+            if (first.Count != second.Length) return false;
+
+            var firstSpan = SpanHelper.AsSpan(first);
+            fixed (<#=type#>* firstPtr = firstSpan, secondPtr = second)
+            {
+                return SequenceEqualCore(firstPtr, secondPtr, first.Count);
+            }
+        }
+
+        public static bool SequenceEqual(this Memory<<#=type#>> first, Memory<<#=type#>> second)
+        {
+            return SequenceEqual((ReadOnlySpan<<#=type#>>)first.Span, (ReadOnlySpan<<#=type#>>)second.Span);
+        }
+
+        public static bool SequenceEqual(this Memory<<#=type#>> first, ReadOnlyMemory<<#=type#>> second)
+        {
+            return SequenceEqual((ReadOnlySpan<<#=type#>>)first.Span, second.Span);
+        }
+
+        public static bool SequenceEqual(this ReadOnlyMemory<<#=type#>> first, ReadOnlyMemory<<#=type#>> second)
+        {
+            return SequenceEqual(first.Span, second.Span);
+        }
+
+        public static bool SequenceEqual(this Span<<#=type#>> first, Span<<#=type#>> second)
+        {
+            return SequenceEqual((ReadOnlySpan<<#=type#>>)first, (ReadOnlySpan<<#=type#>>)second);
+        }
+
+        public static bool SequenceEqual(this Span<<#=type#>> first, ReadOnlySpan<<#=type#>> second)
+        {
+            return SequenceEqual((ReadOnlySpan<<#=type#>>)first, second);
+        }
+
+        public static bool SequenceEqual(this ReadOnlySpan<<#=type#>> first, ReadOnlySpan<<#=type#>> second)
+        {
+            if (first.Length != second.Length) return false;
+
+            fixed (<#=type#>* firstPtr = first, secondPtr = second)
+            {
+                return SequenceEqualCore(firstPtr, secondPtr, first.Length);
+            }
+        }
+<# } #>
+    }
+}
