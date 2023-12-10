@@ -133,7 +133,7 @@ namespace BurstLinq.Tests
         }
     }
 
-    public class BenchmarkDoubleMinEqual
+    public class BenchmarkDoubleMin
     {
         const int WarmupCount = 5;
         const int MeasurementCount = 100;
@@ -164,7 +164,7 @@ namespace BurstLinq.Tests
             })
             .WarmupCount(WarmupCount)
             .MeasurementCount(MeasurementCount)
-            .SampleGroup(new SampleGroup("Int Min: For", SampleUnit.Microsecond))
+            .SampleGroup(new SampleGroup("Double Min: For", SampleUnit.Microsecond))
             .Run();
         }
 
@@ -177,7 +177,7 @@ namespace BurstLinq.Tests
             })
             .WarmupCount(WarmupCount)
             .MeasurementCount(MeasurementCount)
-            .SampleGroup(new SampleGroup("Int Min: LINQ", SampleUnit.Microsecond))
+            .SampleGroup(new SampleGroup("Double Min: LINQ", SampleUnit.Microsecond))
             .Run();
         }
 
@@ -190,7 +190,7 @@ namespace BurstLinq.Tests
             })
             .WarmupCount(WarmupCount)
             .MeasurementCount(MeasurementCount)
-            .SampleGroup(new SampleGroup("Int Min: BurstLinq", SampleUnit.Microsecond))
+            .SampleGroup(new SampleGroup("Double Min: BurstLinq", SampleUnit.Microsecond))
             .Run();
         }
     }
