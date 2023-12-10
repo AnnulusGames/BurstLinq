@@ -14,6 +14,11 @@
         "float2", "float3", "float4",
         "double2", "double3", "double4",
     };
+
+    bool IsPrimitiveAndVectorSupported(string type)
+    {
+        return type is "int" or "uint" or "float" or "double";
+    }
 #>
 using Unity.Burst;
 using Unity.Burst.CompilerServices;
@@ -45,6 +50,26 @@ namespace BurstLinq
             return SequenceEqualCore((<#=type#>*)first.GetUnsafePtr(), (<#=type#>*)second.GetUnsafePtr(), first.Length);
         }
 
+<#if (IsPrimitiveAndVectorSupported(type)) { #>
+        [BurstCompile]
+        internal static bool SequenceEqualCore(<#=type#>* firstPtr, <#=type#>* secondPtr, [AssumeRange(0, int.MaxValue)] int length)
+        {
+            var index = 0;
+            var l = length / 4;
+            for (; index < l; index += 4)
+            {
+                var c = *(<#=type#>4*)(firstPtr + index) == *(<#=type#>4*)(secondPtr + index);
+                if (!math.all(c)) return false;
+            }
+
+            for (; index < length; index++)
+            {
+                if (!firstPtr[index].Equals(secondPtr[index])) return false;
+            }
+
+            return true;
+        }
+<#} else { #>
         [BurstCompile]
         internal unsafe static bool SequenceEqualCore(<#=type#>* firstPtr, <#=type#>* secondPtr, [AssumeRange(0, int.MaxValue)] int length)
         {
@@ -54,6 +79,7 @@ namespace BurstLinq
             }
             return true;
         }
+<# } #>
 
 <# } #>
     }

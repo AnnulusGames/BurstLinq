@@ -129,11 +129,20 @@ namespace BurstLinq
         }
 
         [BurstCompile]
-        internal unsafe static bool ContainsCore(int* ptr, [AssumeRange(0, int.MaxValue)] int length, in int value)
+        internal static bool ContainsCore(int* ptr, [AssumeRange(1, int.MaxValue)] int length, in int value)
         {
-            for (int i = 0; i < length; i++)
+            var index = 0;
+            var value4 = new int4(value, value, value, value);
+            var l = length / 4;
+            for (; index < l; index += 4)
             {
-                if (ptr[i].Equals(value)) return true;
+                var c = value4 == *(int4*)(ptr + index);
+                if (math.any(c)) return true;
+            }
+
+            for (; index < length; index++)
+            {
+                if (ptr[index].Equals(value)) return true;
             }
 
             return false;
@@ -155,11 +164,20 @@ namespace BurstLinq
         }
 
         [BurstCompile]
-        internal unsafe static bool ContainsCore(uint* ptr, [AssumeRange(0, int.MaxValue)] int length, in uint value)
+        internal static bool ContainsCore(uint* ptr, [AssumeRange(1, int.MaxValue)] int length, in uint value)
         {
-            for (int i = 0; i < length; i++)
+            var index = 0;
+            var value4 = new uint4(value, value, value, value);
+            var l = length / 4;
+            for (; index < l; index += 4)
             {
-                if (ptr[i].Equals(value)) return true;
+                var c = value4 == *(uint4*)(ptr + index);
+                if (math.any(c)) return true;
+            }
+
+            for (; index < length; index++)
+            {
+                if (ptr[index].Equals(value)) return true;
             }
 
             return false;
@@ -233,11 +251,20 @@ namespace BurstLinq
         }
 
         [BurstCompile]
-        internal unsafe static bool ContainsCore(float* ptr, [AssumeRange(0, int.MaxValue)] int length, in float value)
+        internal static bool ContainsCore(float* ptr, [AssumeRange(1, int.MaxValue)] int length, in float value)
         {
-            for (int i = 0; i < length; i++)
+            var index = 0;
+            var value4 = new float4(value, value, value, value);
+            var l = length / 4;
+            for (; index < l; index += 4)
             {
-                if (ptr[i].Equals(value)) return true;
+                var c = value4 == *(float4*)(ptr + index);
+                if (math.any(c)) return true;
+            }
+
+            for (; index < length; index++)
+            {
+                if (ptr[index].Equals(value)) return true;
             }
 
             return false;
@@ -259,11 +286,20 @@ namespace BurstLinq
         }
 
         [BurstCompile]
-        internal unsafe static bool ContainsCore(double* ptr, [AssumeRange(0, int.MaxValue)] int length, in double value)
+        internal static bool ContainsCore(double* ptr, [AssumeRange(1, int.MaxValue)] int length, in double value)
         {
-            for (int i = 0; i < length; i++)
+            var index = 0;
+            var value4 = new double4(value, value, value, value);
+            var l = length / 4;
+            for (; index < l; index += 4)
             {
-                if (ptr[i].Equals(value)) return true;
+                var c = value4 == *(double4*)(ptr + index);
+                if (math.any(c)) return true;
+            }
+
+            for (; index < length; index++)
+            {
+                if (ptr[index].Equals(value)) return true;
             }
 
             return false;

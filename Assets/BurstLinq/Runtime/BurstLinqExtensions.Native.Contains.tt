@@ -14,6 +14,11 @@
         "float2", "float3", "float4",
         "double2", "double3", "double4",
     };
+
+    bool IsPrimitiveAndVectorSupported(string type)
+    {
+        return type is "int" or "uint" or "float" or "double";
+    }
 #>
 using Unity.Burst;
 using Unity.Burst.CompilerServices;
@@ -42,6 +47,27 @@ namespace BurstLinq
             return ContainsCore((<#=type#>*)source.GetUnsafePtr(), source.Length, value);
         }
 
+<#if (IsPrimitiveAndVectorSupported(type)) { #>
+        [BurstCompile]
+        internal static bool ContainsCore(<#=type#>* ptr, [AssumeRange(1, int.MaxValue)] int length, in <#=type#> value)
+        {
+            var index = 0;
+            var value4 = new <#=type#>4(value, value, value, value);
+            var l = length / 4;
+            for (; index < l; index += 4)
+            {
+                var c = value4 == *(<#=type#>4*)(ptr + index);
+                if (math.any(c)) return true;
+            }
+
+            for (; index < length; index++)
+            {
+                if (ptr[index].Equals(value)) return true;
+            }
+
+            return false;
+        }
+<#} else { #>
         [BurstCompile]
         internal unsafe static bool ContainsCore(<#=type#>* ptr, [AssumeRange(0, int.MaxValue)] int length, in <#=type#> value)
         {
@@ -52,6 +78,7 @@ namespace BurstLinq
 
             return false;
         }
+<# } #>
 
 <# } #>
     }
