@@ -2,6 +2,7 @@ using Unity.Burst;
 using Unity.Burst.CompilerServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Mathematics;
 
 namespace BurstLinq
 {
@@ -155,10 +156,18 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MinCore(int* ptr, [AssumeRange(1, int.MaxValue)] int length, out int result)
         {
-            result = int.MaxValue;
-            for (int i = 0; i < length; i++)
+            var index = 0;
+            var result4 = new int4(int.MaxValue, int.MaxValue, int.MaxValue, int.MaxValue);
+            var l = length / 4;
+            for (; index < l; index += 4)
             {
-                if (result > ptr[i]) result = ptr[i];
+                result4 = math.min(result4, *(int4*)(ptr + index));
+            }
+
+            result = math.cmin(result4);
+            for (; index < length; index++)
+            {
+                result = math.min(result, ptr[index]);
             }
         }
 
@@ -186,10 +195,18 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MinCore(uint* ptr, [AssumeRange(1, int.MaxValue)] int length, out uint result)
         {
-            result = uint.MaxValue;
-            for (int i = 0; i < length; i++)
+            var index = 0;
+            var result4 = new uint4(uint.MaxValue, uint.MaxValue, uint.MaxValue, uint.MaxValue);
+            var l = length / 4;
+            for (; index < l; index += 4)
             {
-                if (result > ptr[i]) result = ptr[i];
+                result4 = math.min(result4, *(uint4*)(ptr + index));
+            }
+
+            result = math.cmin(result4);
+            for (; index < length; index++)
+            {
+                result = math.min(result, ptr[index]);
             }
         }
 
@@ -279,10 +296,18 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MinCore(float* ptr, [AssumeRange(1, int.MaxValue)] int length, out float result)
         {
-            result = float.MaxValue;
-            for (int i = 0; i < length; i++)
+            var index = 0;
+            var result4 = new float4(float.MaxValue, float.MaxValue, float.MaxValue, float.MaxValue);
+            var l = length / 4;
+            for (; index < l; index += 4)
             {
-                if (result > ptr[i]) result = ptr[i];
+                result4 = math.min(result4, *(float4*)(ptr + index));
+            }
+
+            result = math.cmin(result4);
+            for (; index < length; index++)
+            {
+                result = math.min(result, ptr[index]);
             }
         }
 
@@ -310,10 +335,18 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MinCore(double* ptr, [AssumeRange(1, int.MaxValue)] int length, out double result)
         {
-            result = double.MaxValue;
-            for (int i = 0; i < length; i++)
+            var index = 0;
+            var result4 = new double4(double.MaxValue, double.MaxValue, double.MaxValue, double.MaxValue);
+            var l = length / 4;
+            for (; index < l; index += 4)
             {
-                if (result > ptr[i]) result = ptr[i];
+                result4 = math.min(result4, *(double4*)(ptr + index));
+            }
+
+            result = math.cmin(result4);
+            for (; index < length; index++)
+            {
+                result = math.min(result, ptr[index]);
             }
         }
 

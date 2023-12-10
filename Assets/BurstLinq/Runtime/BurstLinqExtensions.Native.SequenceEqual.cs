@@ -140,12 +140,21 @@ namespace BurstLinq
         }
 
         [BurstCompile]
-        internal unsafe static bool SequenceEqualCore(int* firstPtr, int* secondPtr, [AssumeRange(0, int.MaxValue)] int length)
+        internal static bool SequenceEqualCore(int* firstPtr, int* secondPtr, [AssumeRange(0, int.MaxValue)] int length)
         {
-            for (int i = 0; i < length; i++)
+            var index = 0;
+            var l = length / 4;
+            for (; index < l; index += 4)
             {
-                if (!firstPtr[i].Equals(secondPtr[i])) return false;
+                var c = *(int4*)(firstPtr + index) == *(int4*)(secondPtr + index);
+                if (!math.all(c)) return false;
             }
+
+            for (; index < length; index++)
+            {
+                if (!firstPtr[index].Equals(secondPtr[index])) return false;
+            }
+
             return true;
         }
 
@@ -168,12 +177,21 @@ namespace BurstLinq
         }
 
         [BurstCompile]
-        internal unsafe static bool SequenceEqualCore(uint* firstPtr, uint* secondPtr, [AssumeRange(0, int.MaxValue)] int length)
+        internal static bool SequenceEqualCore(uint* firstPtr, uint* secondPtr, [AssumeRange(0, int.MaxValue)] int length)
         {
-            for (int i = 0; i < length; i++)
+            var index = 0;
+            var l = length / 4;
+            for (; index < l; index += 4)
             {
-                if (!firstPtr[i].Equals(secondPtr[i])) return false;
+                var c = *(uint4*)(firstPtr + index) == *(uint4*)(secondPtr + index);
+                if (!math.all(c)) return false;
             }
+
+            for (; index < length; index++)
+            {
+                if (!firstPtr[index].Equals(secondPtr[index])) return false;
+            }
+
             return true;
         }
 
@@ -252,12 +270,21 @@ namespace BurstLinq
         }
 
         [BurstCompile]
-        internal unsafe static bool SequenceEqualCore(float* firstPtr, float* secondPtr, [AssumeRange(0, int.MaxValue)] int length)
+        internal static bool SequenceEqualCore(float* firstPtr, float* secondPtr, [AssumeRange(0, int.MaxValue)] int length)
         {
-            for (int i = 0; i < length; i++)
+            var index = 0;
+            var l = length / 4;
+            for (; index < l; index += 4)
             {
-                if (!firstPtr[i].Equals(secondPtr[i])) return false;
+                var c = *(float4*)(firstPtr + index) == *(float4*)(secondPtr + index);
+                if (!math.all(c)) return false;
             }
+
+            for (; index < length; index++)
+            {
+                if (!firstPtr[index].Equals(secondPtr[index])) return false;
+            }
+
             return true;
         }
 
@@ -280,12 +307,21 @@ namespace BurstLinq
         }
 
         [BurstCompile]
-        internal unsafe static bool SequenceEqualCore(double* firstPtr, double* secondPtr, [AssumeRange(0, int.MaxValue)] int length)
+        internal static bool SequenceEqualCore(double* firstPtr, double* secondPtr, [AssumeRange(0, int.MaxValue)] int length)
         {
-            for (int i = 0; i < length; i++)
+            var index = 0;
+            var l = length / 4;
+            for (; index < l; index += 4)
             {
-                if (!firstPtr[i].Equals(secondPtr[i])) return false;
+                var c = *(double4*)(firstPtr + index) == *(double4*)(secondPtr + index);
+                if (!math.all(c)) return false;
             }
+
+            for (; index < length; index++)
+            {
+                if (!firstPtr[index].Equals(secondPtr[index])) return false;
+            }
+
             return true;
         }
 
