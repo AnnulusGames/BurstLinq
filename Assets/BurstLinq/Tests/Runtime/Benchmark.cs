@@ -260,6 +260,72 @@ namespace BurstLinq.Tests
             .Run();
         }
     }
+
+
+    public class BenchmarkIntContains
+    {
+        const int WarmupCount = 5;
+        const int MeasurementCount = 100;
+
+        static readonly int[] array = Enumerable.Range(0, 10000).ToArray();
+
+        [TearDown]
+        public void TearDown()
+        {
+            GC.Collect();
+        }
+
+        [Test, Performance]
+        public void For()
+        {
+            Measure.Method(() =>
+            {
+                if (array == null) return;
+
+                var value = array.Last();
+                var result = false;
+                for (int i = 0; i < array.Length; i++)
+                {
+                    if (array[i] == value)
+                    {
+                        result = true;
+                        break;
+                    }
+                }
+            })
+            .WarmupCount(WarmupCount)
+            .MeasurementCount(MeasurementCount)
+            .SampleGroup(new SampleGroup("Int Contains: For", SampleUnit.Microsecond))
+            .Run();
+        }
+
+        [Test, Performance]
+        public void LINQ()
+        {
+            Measure.Method(() =>
+            {
+                Enumerable.Contains(array, array.Last());
+            })
+            .WarmupCount(WarmupCount)
+            .MeasurementCount(MeasurementCount)
+            .SampleGroup(new SampleGroup("Int Contains: LINQ", SampleUnit.Microsecond))
+            .Run();
+        }
+
+        [Test, Performance]
+        public void BurstLinq()
+        {
+            Measure.Method(() =>
+            {
+                BurstLinqExtensions.Contains(array, array.Last());
+            })
+            .WarmupCount(WarmupCount)
+            .MeasurementCount(MeasurementCount)
+            .SampleGroup(new SampleGroup("Int Contains: BurstLinq", SampleUnit.Microsecond))
+            .Run();
+        }
+    }
+
 }
 
 #pragma warning restore CS0219
