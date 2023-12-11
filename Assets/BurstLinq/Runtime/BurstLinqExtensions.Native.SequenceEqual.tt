@@ -14,7 +14,13 @@
         "float2", "float3", "float4",
         "double2", "double3", "double4",
     };
-
+    bool IsFloats(string type) {
+        return type is "float"  or "float2" or "float3" or "float4"  or "Vector2" or "Vector3" or "Vector4";
+    }
+    bool IsFloatsOrDoubles(string type) {
+        return type is "float" or "double" or "float2" or "float3" or "float4" or "double2" or "double3" or "double4" or "Vector2" or "Vector3" or "Vector4";
+    }
+    
     bool IsPrimitiveAndVectorSupported(string type)
     {
         return type is "int" or "uint" or "float" or "double";
@@ -22,6 +28,7 @@
 #>
 using Unity.Burst;
 using Unity.Burst.CompilerServices;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
@@ -31,6 +38,68 @@ namespace BurstLinq
 {
     public unsafe static partial class BurstLinqExtensions
     {
+        [BurstCompile]
+        internal static bool MemCmp(void* firstPtr,void* secondPtr, [AssumeRange(1, int.MaxValue)] long length) {
+            static bool _equal(v256 a, v256 b) {
+                return a.ULong0 == b.ULong0 && a.ULong1 == b.ULong1 && a.ULong2 == b.ULong2 && a.ULong3 == b.ULong3;
+            }
+            var packingLength = sizeof(v256) / sizeof(byte);
+            var packedLength = length / (packingLength);
+            var firstAs256 = (v256*) firstPtr;
+            var secondAs256 = (v256*) secondPtr;
+            for (var i = 0; i < packedLength; i++) {
+                if(_equal(firstAs256[i],secondAs256[i])) continue;
+                return false;
+            }
+            
+            var firstAs8 = (byte*) firstPtr;
+            var secondAs8 = (byte*) firstPtr;
+            
+            for (var index = packedLength * packingLength; index < length; index++) {
+                if(firstAs8[index]== secondAs8[index]) continue;
+                return false;
+            }
+            return true;
+        }
+        [BurstCompile]
+        internal static bool FloatCmp(float* firstPtr,float* secondPtr, [AssumeRange(1, int.MaxValue)] long length) {
+            static bool _equal(v256 a, v256 b) {
+                return a.Float0 == b.Float0 && a.Float1 == b.Float1 && a.Float2 == b.Float2 && a.Float3 == b.Float3 &&
+                       a.Float4 == b.Float4 && a.Float5 == b.Float5 && a.Float6 == b.Float6 && a.Float7 == b.Float7;
+            }
+            var packingLength = sizeof(v256) / sizeof(float);
+            var packedLength = length / (packingLength);
+            var firstAs256 = (v256*) firstPtr;
+            var secondAs256 = (v256*) secondPtr;
+            for (var i = 0; i < packedLength; i++) {
+                if(_equal(firstAs256[i],secondAs256[i])) continue;
+                return false;
+            }
+            for (var index = packedLength * packingLength; index < length; index++) {
+                if(firstPtr[index]== secondPtr[index]) continue;
+                return false;
+            }
+            return true;
+        }
+        [BurstCompile]
+        internal static bool DoubleCmp(double* firstPtr,double* secondPtr, [AssumeRange(1, int.MaxValue)] long length) {
+            static bool _equal(v256 a, v256 b) {
+                return a.Double0 == b.Double0 && a.Double1 == b.Double1 && a.Double2 == b.Double2 && a.Double3 == b.Double3 ;
+            }
+            var packingLength = sizeof(v256) / sizeof(double);
+            var packedLength = length / (packingLength);
+            var firstAs256 = (v256*) firstPtr;
+            var secondAs256 = (v256*) secondPtr;
+            for (var i = 0; i < packedLength; i++) {
+                if(_equal(firstAs256[i],secondAs256[i])) continue;
+                 return false;
+            }
+            for (var index = packedLength * packingLength; index < length; index++) {
+                if(firstPtr[index]== secondPtr[index]) continue;
+                 return false;
+            }
+            return true;
+        }
 <# foreach(var type in types) { #>
         public static bool SequenceEqual(this NativeList<<#=type#>> first, NativeList<<#=type#>> second)
         {
@@ -38,7 +107,7 @@ namespace BurstLinq
             return SequenceEqualCore(first.GetUnsafePtr(), second.GetUnsafePtr(), first.Length);
         }
 
-        public unsafe static bool SequenceEqual(this NativeSlice<<#=type#>> first, NativeSlice<<#=type#>> second)
+        public  static bool SequenceEqual(this NativeSlice<<#=type#>> first, NativeSlice<<#=type#>> second)
         {
             if (first.Length != second.Length) return false;
             return SequenceEqualCore((<#=type#>*)first.GetUnsafePtr(), (<#=type#>*)second.GetUnsafePtr(), first.Length);
@@ -50,34 +119,21 @@ namespace BurstLinq
             return SequenceEqualCore((<#=type#>*)first.GetUnsafePtr(), (<#=type#>*)second.GetUnsafePtr(), first.Length);
         }
 
-<#if (IsPrimitiveAndVectorSupported(type)) { #>
-        [BurstCompile]
+<#if (!IsFloatsOrDoubles(type)) { #>
+       
         internal static bool SequenceEqualCore(<#=type#>* firstPtr, <#=type#>* secondPtr, [AssumeRange(0, int.MaxValue)] int length)
         {
-            var index = 0;
-            var l = length / 4;
-            for (; index < l; index += 4)
-            {
-                var c = *(<#=type#>4*)(firstPtr + index) == *(<#=type#>4*)(secondPtr + index);
-                if (!math.all(c)) return false;
-            }
-
-            for (; index < length; index++)
-            {
-                if (!firstPtr[index].Equals(secondPtr[index])) return false;
-            }
-
-            return true;
+            return MemCmp(firstPtr, secondPtr, length*sizeof(<#=type#>));
+        }
+<#} else if(IsFloats(type)){ #>
+        internal  static bool SequenceEqualCore(<#=type#>* firstPtr, <#=type#>* secondPtr, [AssumeRange(0, int.MaxValue)] int length)
+        {
+             return FloatCmp((float*)firstPtr, (float*)secondPtr, length*(sizeof(<#=type#>)/sizeof(float)));
         }
 <#} else { #>
-        [BurstCompile]
-        internal unsafe static bool SequenceEqualCore(<#=type#>* firstPtr, <#=type#>* secondPtr, [AssumeRange(0, int.MaxValue)] int length)
+        internal  static bool SequenceEqualCore(<#=type#>* firstPtr, <#=type#>* secondPtr, [AssumeRange(0, int.MaxValue)] int length)
         {
-            for (int i = 0; i < length; i++)
-            {
-                if (!firstPtr[i].Equals(secondPtr[i])) return false;
-            }
-            return true;
+             return DoubleCmp((double*)firstPtr, (double*)secondPtr, length*(sizeof(<#=type#>)/sizeof(double)));
         }
 <# } #>
 
