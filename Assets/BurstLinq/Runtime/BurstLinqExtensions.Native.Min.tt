@@ -14,19 +14,52 @@
     {
         return type is "int" or "uint" or "float" or "double";
     }
+   
+    bool IsMinMaxSupported(string type)
+    {
+        return type is "byte" or "sbyte" or "short" or "ushort" or "int" or "uint"  or "float" or "double";
+    }
+
+    string AVXSupportCheck(string type) {
+        if (type is "byte" or "sbyte" or "short" or "ushort" or "int" or "uint" or "long" or "ulong") {
+            return "IsAvx2Supported";
+        }else if (type is "float" or "double") {
+            return "IsAvxSupported";
+        }
+        throw new Exception("Invalid type");
+    }
+    string IntrinsicsName(string type) {
+        switch (@type) {
+            case "sbyte": return "epi8";
+            case "byte": return "epu8";
+            case "short": return "epi16";
+            case "ushort": return "epu16";
+            case "int": return "epi32";
+            case "uint": return "epu32";
+            case "long": return "epi64";
+            case "ulong": return "epu64";
+            case "float": return "ps";
+            case "double": return "pd";
+        }
+        throw new Exception("Invalid type");
+    }
 #>
 using Unity.Burst;
 using Unity.Burst.CompilerServices;
+using Unity.Burst.Intrinsics;
+using static Unity.Burst.Intrinsics.X86.Avx;
+using static Unity.Burst.Intrinsics.X86.Avx2;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 
 namespace BurstLinq
-{
+{  
+   
     public unsafe static partial class BurstLinqExtensions
     {
 <# foreach(var type in types) { #>
-        public static <#=type#> Min(this NativeList<<#=type#>> source)
+         public static <#=type#> Min(this NativeList<<#=type#>> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MinCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -46,37 +79,74 @@ namespace BurstLinq
             MinCore((<#=type#>*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
-<#if (IsVectorSupported(type)) { #>
+<#if (IsMinMaxSupported(type)) { #>
         [BurstCompile]
         internal static void MinCore(<#=type#>* ptr, [AssumeRange(1, int.MaxValue)] int length, out <#=type#> result)
         {
-            var index = 0;
-            var result4 = new <#=type#>4(<#=type#>.MaxValue, <#=type#>.MaxValue, <#=type#>.MaxValue, <#=type#>.MaxValue);
-            var l = length / 4;
-            for (; index < l; index += 4)
-            {
-                result4 = math.min(result4, *(<#=type#>4*)(ptr + index));
+         if (<#=AVXSupportCheck(type)#>) {
+                var temp = new v256(<#=type#>.MaxValue);
+                var l = length / (32 / sizeof(<#=type#>));
+                var ptrAs256 = (v256*) ptr;
+                for (int i = 0; i < l; i++) {
+                    temp = mm256_min_<#=IntrinsicsName(type)#>(temp, ptrAs256[i]);
+                }
+                result = <#=type#>.MaxValue;
+                var tempAsArray = (<#=type#>*)&temp;
+                for (int i = 0; i < 32 / sizeof(<#=type#>); i++) {
+    <#if (IsVectorSupported(type)) { #>
+                    result = math.min(result, tempAsArray[i]);
+    <#} else { #>
+                    if (result > tempAsArray[i]) result = tempAsArray[i];
+    <# } #>
+                }
+                for (int index=l*(32 / sizeof(<#=type#>)); index < length; index++)
+                {
+    <#if (IsVectorSupported(type)) { #>
+                    result = math.min(result, ptr[index]);
+    <#} else { #>
+                    if (result > ptr[index]) result = ptr[index];
+    <# } #>
+                }
             }
+            else {
+    <#if (IsVectorSupported(type)) { #>
+                var index = 0;
+                var result4 = new <#=type#>4(<#=type#>.MaxValue, <#=type#>.MaxValue, <#=type#>.MaxValue, <#=type#>.MaxValue);
+                var l = length / 4;
+                for (; index < l; index += 4)
+                {
+                    result4 = math.min(result4, *(<#=type#>4*)(ptr + index));
+                }
 
-            result = math.cmin(result4);
-            for (; index < length; index++)
-            {
-                result = math.min(result, ptr[index]);
+                result = math.cmin(result4);
+                for (; index < length; index++)
+                {
+                    result = math.min(result, ptr[index]);
+                }
             }
         }
 <#} else { #>
-        [BurstCompile]
-        internal static void MinCore(<#=type#>* ptr, [AssumeRange(1, int.MaxValue)] int length, out <#=type#> result)
-        {
-            result = <#=type#>.MaxValue;
-            for (int i = 0; i < length; i++)
-            {
-                if (result > ptr[i]) result = ptr[i];
+                static <#=type#> localMin(<#=type#> a, <#=type#> b) => a < b ? a : b;
+                result = <#=type#>.MaxValue;
+                for (int i = 0; i < length; i++)
+                {
+                   result = localMin(result, ptr[i]);
+                }
             }
         }
 <# } #>
-
+<# } else { #>
+        [BurstCompile]
+        internal static void MinCore(<#=type#>* ptr, [AssumeRange(1, int.MaxValue)] int length, out <#=type#> result)
+        {
+            static <#=type#> localMin(<#=type#> a, <#=type#> b) => a < b ? a : b;
+            result = <#=type#>.MaxValue;
+            for (int i = 0; i < length; i++)
+            {
+                result = localMin(result, ptr[i]);
+            }
+        }
+<# } #>
 <# } #>
     }
 }
