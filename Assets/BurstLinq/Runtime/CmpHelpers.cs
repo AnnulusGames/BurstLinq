@@ -76,10 +76,6 @@ namespace BurstLinq
             }
             else if (BurstHelpers.IsV128Supported)
             {
-                static bool _equals(v128 a, v128 b)
-                {
-                    return a.Double0 == b.Double0 && a.Double1 == b.Double1;
-                }
                 var packingLength = sizeof(v128) / sizeof(double);
 
                 for (; index < length - packingLength; index += packingLength)
