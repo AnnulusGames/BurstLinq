@@ -83,10 +83,6 @@ namespace BurstLinq
             var tempResult = <#=type#>.MaxValue;
 <# if (IsFloating(type)) {#>
             static <#=type#> _min(<#=type#> a, <#=type#> b) =>IsNeonSupported?math.min(a,b): a < b ? a : b;
-<# } else {#>
-              static <#=type#> _min(<#=type#> a, <#=type#> b) =>a < b ? a : b;
-<# } #>
-<#// if (IsFloating(type)) {#>
             var index= 0;
             if(BurstHelpers.IsV256Supported){
                 static v256 _min256(v256 a, <#=type#>* b) => new v256(
@@ -134,14 +130,14 @@ namespace BurstLinq
                  tempResult = _min(tempResult, ptr[index]);
              }
              result =  tempResult;
-<# //} else {#>
-           
+<# } else {#>
+             static <#=type#> _min(<#=type#> a, <#=type#> b) =>a < b ? a : b;
             
              for (var i = 0; i < length; i++) {
                 tempResult = _min(tempResult, ptr[i]);
              }
              result = tempResult;
-<# //} #>
+<# } #>
         }
 <# } #>
         
