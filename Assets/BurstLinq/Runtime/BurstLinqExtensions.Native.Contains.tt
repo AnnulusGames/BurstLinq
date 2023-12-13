@@ -66,15 +66,12 @@
         }
         throw new Exception("Invalid type");
     }
-    bool TryGetTwiceVector(string type, out string longer) {
-        longer = null;
+    bool TryGetInteger(string type, out string type2) {
+        type2 = null;
         switch (type) {
-            case "int2": longer = "int4"; return true;
-            case "uint2": longer = "uint4"; return true;
-            case "float2": longer = "float4"; return true;
-            case "double2": longer = "double4"; return true;
-            case "Vector2": longer = "float4"; return true;
-            case "Vector2Int": longer = "int4"; return true;
+            case "int2": type2 = "long"; return true;
+            case "uint2": type2 = "long"; return true;
+            case "Vector2Int": type2 = "long"; return true;
             default: return false;
         
         }
@@ -107,12 +104,12 @@ namespace BurstLinq
         {
             return ContainsCore((<#=type#>*)source.GetUnsafePtr(), source.Length, value);
         }
-<#if (TryGetTwiceVector(type,out var twiceType)){#>
+<#if (TryGetInteger(type,out var intType)){#>
         internal static bool ContainsCore(<#=type#>* ptr, [AssumeRange(1, int.MaxValue)] int length, in <#=type#> value)
         {
-           var value2= new <#=twiceType#>(value.x,value.y,value.x,value.y);
-           if(ContainsCore((<#=twiceType#>*)ptr,length/2,value2)) return true;
-            return (length%2==1)&&(ptr[length-1].Equals(value));
+            var temp=value;
+            var union=*(<#=intType#>*)&temp;
+           return ContainsCore((<#=intType#>*)ptr,length,union);
         }
 <#} else if (IsPrimitive(type)) { #>
 <#var vName = V256Name(type);#>

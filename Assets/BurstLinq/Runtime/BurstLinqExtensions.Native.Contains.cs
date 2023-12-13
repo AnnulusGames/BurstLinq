@@ -672,11 +672,15 @@ namespace BurstLinq
         {
             return ContainsCore((Vector2*)source.GetUnsafePtr(), source.Length, value);
         }
-        internal static bool ContainsCore(Vector2* ptr, [AssumeRange(1, int.MaxValue)] int length, in Vector2 value)
+        [BurstCompile]
+        internal  static bool ContainsCore(Vector2* ptr, [AssumeRange(0, int.MaxValue)] int length, in Vector2 value)
         {
-           var value2= new float4(value.x,value.y,value.x,value.y);
-           if(ContainsCore((float4*)ptr,length/2,value2)) return true;
-            return (length%2==1)&&(ptr[length-1].Equals(value));
+            for (int i = 0; i < length; i++)
+            {
+                if (ptr[i].Equals(value)) return true;
+            }
+
+            return false;
         }
         public static bool Contains(this NativeList<Vector2Int> source, Vector2Int value)
         {
@@ -694,9 +698,9 @@ namespace BurstLinq
         }
         internal static bool ContainsCore(Vector2Int* ptr, [AssumeRange(1, int.MaxValue)] int length, in Vector2Int value)
         {
-           var value2= new int4(value.x,value.y,value.x,value.y);
-           if(ContainsCore((int4*)ptr,length/2,value2)) return true;
-            return (length%2==1)&&(ptr[length-1].Equals(value));
+            var temp=value;
+            var union=*(long*)&temp;
+           return ContainsCore((long*)ptr,length,union);
         }
         public static bool Contains(this NativeList<Vector3> source, Vector3 value)
         {
@@ -786,9 +790,9 @@ namespace BurstLinq
         }
         internal static bool ContainsCore(int2* ptr, [AssumeRange(1, int.MaxValue)] int length, in int2 value)
         {
-           var value2= new int4(value.x,value.y,value.x,value.y);
-           if(ContainsCore((int4*)ptr,length/2,value2)) return true;
-            return (length%2==1)&&(ptr[length-1].Equals(value));
+            var temp=value;
+            var union=*(long*)&temp;
+           return ContainsCore((long*)ptr,length,union);
         }
         public static bool Contains(this NativeList<int3> source, int3 value)
         {
@@ -854,9 +858,9 @@ namespace BurstLinq
         }
         internal static bool ContainsCore(uint2* ptr, [AssumeRange(1, int.MaxValue)] int length, in uint2 value)
         {
-           var value2= new uint4(value.x,value.y,value.x,value.y);
-           if(ContainsCore((uint4*)ptr,length/2,value2)) return true;
-            return (length%2==1)&&(ptr[length-1].Equals(value));
+            var temp=value;
+            var union=*(long*)&temp;
+           return ContainsCore((long*)ptr,length,union);
         }
         public static bool Contains(this NativeList<uint3> source, uint3 value)
         {
@@ -920,11 +924,15 @@ namespace BurstLinq
         {
             return ContainsCore((float2*)source.GetUnsafePtr(), source.Length, value);
         }
-        internal static bool ContainsCore(float2* ptr, [AssumeRange(1, int.MaxValue)] int length, in float2 value)
+        [BurstCompile]
+        internal  static bool ContainsCore(float2* ptr, [AssumeRange(0, int.MaxValue)] int length, in float2 value)
         {
-           var value2= new float4(value.x,value.y,value.x,value.y);
-           if(ContainsCore((float4*)ptr,length/2,value2)) return true;
-            return (length%2==1)&&(ptr[length-1].Equals(value));
+            for (int i = 0; i < length; i++)
+            {
+                if (ptr[i].Equals(value)) return true;
+            }
+
+            return false;
         }
         public static bool Contains(this NativeList<float3> source, float3 value)
         {
@@ -988,11 +996,15 @@ namespace BurstLinq
         {
             return ContainsCore((double2*)source.GetUnsafePtr(), source.Length, value);
         }
-        internal static bool ContainsCore(double2* ptr, [AssumeRange(1, int.MaxValue)] int length, in double2 value)
+        [BurstCompile]
+        internal  static bool ContainsCore(double2* ptr, [AssumeRange(0, int.MaxValue)] int length, in double2 value)
         {
-           var value2= new double4(value.x,value.y,value.x,value.y);
-           if(ContainsCore((double4*)ptr,length/2,value2)) return true;
-            return (length%2==1)&&(ptr[length-1].Equals(value));
+            for (int i = 0; i < length; i++)
+            {
+                if (ptr[i].Equals(value)) return true;
+            }
+
+            return false;
         }
         public static bool Contains(this NativeList<double3> source, double3 value)
         {
