@@ -1,12 +1,11 @@
 using Unity.Burst;
 using Unity.Burst.CompilerServices;
 using Unity.Burst.Intrinsics;
-using static Unity.Burst.Intrinsics.X86.Avx;
-using static Unity.Burst.Intrinsics.X86.Avx2;
+using static Unity.Burst.Intrinsics.Arm.Neon;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
-
+using System.Runtime.CompilerServices;
 namespace BurstLinq
 {  
    
@@ -35,33 +34,102 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MinCore(byte* ptr, [AssumeRange(1, int.MaxValue)] int length, out byte result)
         {
-         if (IsAvx2Supported) {
-                var temp = new v256(byte.MaxValue);
-                var l = length / (32 / sizeof(byte));
-                var ptrAs256 = (v256*) ptr;
-                for (int i = 0; i < l; i++) {
-                    temp = mm256_min_epu8(temp, ptrAs256[i]);
-                }
-                result = byte.MaxValue;
-                var tempAsArray = (byte*)&temp;
-                for (int i = 0; i < 32 / sizeof(byte); i++) {
-                        if (result > tempAsArray[i]) result = tempAsArray[i];
+            var tempResult = byte.MaxValue;
+              static byte _min(byte a, byte b) =>a < b ? a : b;
+            var index= 0;
+            if(BurstHelpers.IsV256Supported){
+                static v256 _min256(v256 a, byte* b) => new v256(
+                        _min(a.Byte0, b[0]),
+                        _min(a.Byte1, b[1]),
+                        _min(a.Byte2, b[2]),
+                        _min(a.Byte3, b[3]),
+                        _min(a.Byte4, b[4]),
+                        _min(a.Byte5, b[5]),
+                        _min(a.Byte6, b[6]),
+                        _min(a.Byte7, b[7]),
+                        _min(a.Byte8, b[8]),
+                        _min(a.Byte9, b[9]),
+                        _min(a.Byte10, b[10]),
+                        _min(a.Byte11, b[11]),
+                        _min(a.Byte12, b[12]),
+                        _min(a.Byte13, b[13]),
+                        _min(a.Byte14, b[14]),
+                        _min(a.Byte15, b[15]),
+                        _min(a.Byte16, b[16]),
+                        _min(a.Byte17, b[17]),
+                        _min(a.Byte18, b[18]),
+                        _min(a.Byte19, b[19]),
+                        _min(a.Byte20, b[20]),
+                        _min(a.Byte21, b[21]),
+                        _min(a.Byte22, b[22]),
+                        _min(a.Byte23, b[23]),
+                        _min(a.Byte24, b[24]),
+                        _min(a.Byte25, b[25]),
+                        _min(a.Byte26, b[26]),
+                        _min(a.Byte27, b[27]),
+                        _min(a.Byte28, b[28]),
+                        _min(a.Byte29, b[29]),
+                        _min(a.Byte30, b[30]),
+                        _min(a.Byte31, b[31])
+                );
+                
+                var packingLength = sizeof(v256) / sizeof(byte);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v256(byte.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min256(temp, ptr+index);
                     }
-                for (int index=l*(32 / sizeof(byte)); index < length; index++)
-                {
-                        if (result > ptr[index]) result = ptr[index];
+                    byte* tempAsArray = (byte*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
                     }
-            }
-            else {
-                    static byte localMin(byte a, byte b) => a < b ? a : b;
-                result = byte.MaxValue;
-                for (int i = 0; i < length; i++)
-                {
-                   result = localMin(result, ptr[i]);
+                }    
+             }else if(BurstHelpers.IsV128Supported){
+                static v128 _min128(v128 a, byte* b) => new v128(
+                    _min(a.Byte0, b[0]),
+                    _min(a.Byte1, b[1]),
+                    _min(a.Byte2, b[2]),
+                    _min(a.Byte3, b[3]),
+                    _min(a.Byte4, b[4]),
+                    _min(a.Byte5, b[5]),
+                    _min(a.Byte6, b[6]),
+                    _min(a.Byte7, b[7]),
+                    _min(a.Byte8, b[8]),
+                    _min(a.Byte9, b[9]),
+                    _min(a.Byte10, b[10]),
+                    _min(a.Byte11, b[11]),
+                    _min(a.Byte12, b[12]),
+                    _min(a.Byte13, b[13]),
+                    _min(a.Byte14, b[14]),
+                    _min(a.Byte15, b[15])
+                );
+                
+                var packingLength = sizeof(v128) / sizeof(byte);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v128(byte.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min128(temp, ptr+index);
+                    }
+                    byte* tempAsArray = (byte*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
+                    }
                 }
-            }
+             }
+             for (; index < length; index++) {
+                 tempResult = _min(tempResult, ptr[index]);
+             }
+             result =  tempResult;
+           
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _min(tempResult, ptr[i]);
+             }
+             result = tempResult;
         }
-                 public static sbyte Min(this NativeList<sbyte> source)
+         public static sbyte Min(this NativeList<sbyte> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MinCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -84,33 +152,102 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MinCore(sbyte* ptr, [AssumeRange(1, int.MaxValue)] int length, out sbyte result)
         {
-         if (IsAvx2Supported) {
-                var temp = new v256(sbyte.MaxValue);
-                var l = length / (32 / sizeof(sbyte));
-                var ptrAs256 = (v256*) ptr;
-                for (int i = 0; i < l; i++) {
-                    temp = mm256_min_epi8(temp, ptrAs256[i]);
-                }
-                result = sbyte.MaxValue;
-                var tempAsArray = (sbyte*)&temp;
-                for (int i = 0; i < 32 / sizeof(sbyte); i++) {
-                        if (result > tempAsArray[i]) result = tempAsArray[i];
+            var tempResult = sbyte.MaxValue;
+              static sbyte _min(sbyte a, sbyte b) =>a < b ? a : b;
+            var index= 0;
+            if(BurstHelpers.IsV256Supported){
+                static v256 _min256(v256 a, sbyte* b) => new v256(
+                        _min(a.SByte0, b[0]),
+                        _min(a.SByte1, b[1]),
+                        _min(a.SByte2, b[2]),
+                        _min(a.SByte3, b[3]),
+                        _min(a.SByte4, b[4]),
+                        _min(a.SByte5, b[5]),
+                        _min(a.SByte6, b[6]),
+                        _min(a.SByte7, b[7]),
+                        _min(a.SByte8, b[8]),
+                        _min(a.SByte9, b[9]),
+                        _min(a.SByte10, b[10]),
+                        _min(a.SByte11, b[11]),
+                        _min(a.SByte12, b[12]),
+                        _min(a.SByte13, b[13]),
+                        _min(a.SByte14, b[14]),
+                        _min(a.SByte15, b[15]),
+                        _min(a.SByte16, b[16]),
+                        _min(a.SByte17, b[17]),
+                        _min(a.SByte18, b[18]),
+                        _min(a.SByte19, b[19]),
+                        _min(a.SByte20, b[20]),
+                        _min(a.SByte21, b[21]),
+                        _min(a.SByte22, b[22]),
+                        _min(a.SByte23, b[23]),
+                        _min(a.SByte24, b[24]),
+                        _min(a.SByte25, b[25]),
+                        _min(a.SByte26, b[26]),
+                        _min(a.SByte27, b[27]),
+                        _min(a.SByte28, b[28]),
+                        _min(a.SByte29, b[29]),
+                        _min(a.SByte30, b[30]),
+                        _min(a.SByte31, b[31])
+                );
+                
+                var packingLength = sizeof(v256) / sizeof(sbyte);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v256(sbyte.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min256(temp, ptr+index);
                     }
-                for (int index=l*(32 / sizeof(sbyte)); index < length; index++)
-                {
-                        if (result > ptr[index]) result = ptr[index];
+                    sbyte* tempAsArray = (sbyte*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
                     }
-            }
-            else {
-                    static sbyte localMin(sbyte a, sbyte b) => a < b ? a : b;
-                result = sbyte.MaxValue;
-                for (int i = 0; i < length; i++)
-                {
-                   result = localMin(result, ptr[i]);
+                }    
+             }else if(BurstHelpers.IsV128Supported){
+                static v128 _min128(v128 a, sbyte* b) => new v128(
+                    _min(a.SByte0, b[0]),
+                    _min(a.SByte1, b[1]),
+                    _min(a.SByte2, b[2]),
+                    _min(a.SByte3, b[3]),
+                    _min(a.SByte4, b[4]),
+                    _min(a.SByte5, b[5]),
+                    _min(a.SByte6, b[6]),
+                    _min(a.SByte7, b[7]),
+                    _min(a.SByte8, b[8]),
+                    _min(a.SByte9, b[9]),
+                    _min(a.SByte10, b[10]),
+                    _min(a.SByte11, b[11]),
+                    _min(a.SByte12, b[12]),
+                    _min(a.SByte13, b[13]),
+                    _min(a.SByte14, b[14]),
+                    _min(a.SByte15, b[15])
+                );
+                
+                var packingLength = sizeof(v128) / sizeof(sbyte);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v128(sbyte.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min128(temp, ptr+index);
+                    }
+                    sbyte* tempAsArray = (sbyte*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
+                    }
                 }
-            }
+             }
+             for (; index < length; index++) {
+                 tempResult = _min(tempResult, ptr[index]);
+             }
+             result =  tempResult;
+           
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _min(tempResult, ptr[i]);
+             }
+             result = tempResult;
         }
-                 public static short Min(this NativeList<short> source)
+         public static short Min(this NativeList<short> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MinCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -133,33 +270,78 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MinCore(short* ptr, [AssumeRange(1, int.MaxValue)] int length, out short result)
         {
-         if (IsAvx2Supported) {
-                var temp = new v256(short.MaxValue);
-                var l = length / (32 / sizeof(short));
-                var ptrAs256 = (v256*) ptr;
-                for (int i = 0; i < l; i++) {
-                    temp = mm256_min_epi16(temp, ptrAs256[i]);
-                }
-                result = short.MaxValue;
-                var tempAsArray = (short*)&temp;
-                for (int i = 0; i < 32 / sizeof(short); i++) {
-                        if (result > tempAsArray[i]) result = tempAsArray[i];
+            var tempResult = short.MaxValue;
+              static short _min(short a, short b) =>a < b ? a : b;
+            var index= 0;
+            if(BurstHelpers.IsV256Supported){
+                static v256 _min256(v256 a, short* b) => new v256(
+                        _min(a.SShort0, b[0]),
+                        _min(a.SShort1, b[1]),
+                        _min(a.SShort2, b[2]),
+                        _min(a.SShort3, b[3]),
+                        _min(a.SShort4, b[4]),
+                        _min(a.SShort5, b[5]),
+                        _min(a.SShort6, b[6]),
+                        _min(a.SShort7, b[7]),
+                        _min(a.SShort8, b[8]),
+                        _min(a.SShort9, b[9]),
+                        _min(a.SShort10, b[10]),
+                        _min(a.SShort11, b[11]),
+                        _min(a.SShort12, b[12]),
+                        _min(a.SShort13, b[13]),
+                        _min(a.SShort14, b[14]),
+                        _min(a.SShort15, b[15])
+                );
+                
+                var packingLength = sizeof(v256) / sizeof(short);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v256(short.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min256(temp, ptr+index);
                     }
-                for (int index=l*(32 / sizeof(short)); index < length; index++)
-                {
-                        if (result > ptr[index]) result = ptr[index];
+                    short* tempAsArray = (short*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
                     }
-            }
-            else {
-                    static short localMin(short a, short b) => a < b ? a : b;
-                result = short.MaxValue;
-                for (int i = 0; i < length; i++)
-                {
-                   result = localMin(result, ptr[i]);
+                }    
+             }else if(BurstHelpers.IsV128Supported){
+                static v128 _min128(v128 a, short* b) => new v128(
+                    _min(a.SShort0, b[0]),
+                    _min(a.SShort1, b[1]),
+                    _min(a.SShort2, b[2]),
+                    _min(a.SShort3, b[3]),
+                    _min(a.SShort4, b[4]),
+                    _min(a.SShort5, b[5]),
+                    _min(a.SShort6, b[6]),
+                    _min(a.SShort7, b[7])
+                );
+                
+                var packingLength = sizeof(v128) / sizeof(short);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v128(short.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min128(temp, ptr+index);
+                    }
+                    short* tempAsArray = (short*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
+                    }
                 }
-            }
+             }
+             for (; index < length; index++) {
+                 tempResult = _min(tempResult, ptr[index]);
+             }
+             result =  tempResult;
+           
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _min(tempResult, ptr[i]);
+             }
+             result = tempResult;
         }
-                 public static ushort Min(this NativeList<ushort> source)
+         public static ushort Min(this NativeList<ushort> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MinCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -182,33 +364,78 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MinCore(ushort* ptr, [AssumeRange(1, int.MaxValue)] int length, out ushort result)
         {
-         if (IsAvx2Supported) {
-                var temp = new v256(ushort.MaxValue);
-                var l = length / (32 / sizeof(ushort));
-                var ptrAs256 = (v256*) ptr;
-                for (int i = 0; i < l; i++) {
-                    temp = mm256_min_epu16(temp, ptrAs256[i]);
-                }
-                result = ushort.MaxValue;
-                var tempAsArray = (ushort*)&temp;
-                for (int i = 0; i < 32 / sizeof(ushort); i++) {
-                        if (result > tempAsArray[i]) result = tempAsArray[i];
+            var tempResult = ushort.MaxValue;
+              static ushort _min(ushort a, ushort b) =>a < b ? a : b;
+            var index= 0;
+            if(BurstHelpers.IsV256Supported){
+                static v256 _min256(v256 a, ushort* b) => new v256(
+                        _min(a.UShort0, b[0]),
+                        _min(a.UShort1, b[1]),
+                        _min(a.UShort2, b[2]),
+                        _min(a.UShort3, b[3]),
+                        _min(a.UShort4, b[4]),
+                        _min(a.UShort5, b[5]),
+                        _min(a.UShort6, b[6]),
+                        _min(a.UShort7, b[7]),
+                        _min(a.UShort8, b[8]),
+                        _min(a.UShort9, b[9]),
+                        _min(a.UShort10, b[10]),
+                        _min(a.UShort11, b[11]),
+                        _min(a.UShort12, b[12]),
+                        _min(a.UShort13, b[13]),
+                        _min(a.UShort14, b[14]),
+                        _min(a.UShort15, b[15])
+                );
+                
+                var packingLength = sizeof(v256) / sizeof(ushort);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v256(ushort.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min256(temp, ptr+index);
                     }
-                for (int index=l*(32 / sizeof(ushort)); index < length; index++)
-                {
-                        if (result > ptr[index]) result = ptr[index];
+                    ushort* tempAsArray = (ushort*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
                     }
-            }
-            else {
-                    static ushort localMin(ushort a, ushort b) => a < b ? a : b;
-                result = ushort.MaxValue;
-                for (int i = 0; i < length; i++)
-                {
-                   result = localMin(result, ptr[i]);
+                }    
+             }else if(BurstHelpers.IsV128Supported){
+                static v128 _min128(v128 a, ushort* b) => new v128(
+                    _min(a.UShort0, b[0]),
+                    _min(a.UShort1, b[1]),
+                    _min(a.UShort2, b[2]),
+                    _min(a.UShort3, b[3]),
+                    _min(a.UShort4, b[4]),
+                    _min(a.UShort5, b[5]),
+                    _min(a.UShort6, b[6]),
+                    _min(a.UShort7, b[7])
+                );
+                
+                var packingLength = sizeof(v128) / sizeof(ushort);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v128(ushort.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min128(temp, ptr+index);
+                    }
+                    ushort* tempAsArray = (ushort*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
+                    }
                 }
-            }
+             }
+             for (; index < length; index++) {
+                 tempResult = _min(tempResult, ptr[index]);
+             }
+             result =  tempResult;
+           
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _min(tempResult, ptr[i]);
+             }
+             result = tempResult;
         }
-                 public static int Min(this NativeList<int> source)
+         public static int Min(this NativeList<int> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MinCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -231,40 +458,66 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MinCore(int* ptr, [AssumeRange(1, int.MaxValue)] int length, out int result)
         {
-         if (IsAvx2Supported) {
-                var temp = new v256(int.MaxValue);
-                var l = length / (32 / sizeof(int));
-                var ptrAs256 = (v256*) ptr;
-                for (int i = 0; i < l; i++) {
-                    temp = mm256_min_epi32(temp, ptrAs256[i]);
-                }
-                result = int.MaxValue;
-                var tempAsArray = (int*)&temp;
-                for (int i = 0; i < 32 / sizeof(int); i++) {
-                        result = math.min(result, tempAsArray[i]);
+            var tempResult = int.MaxValue;
+              static int _min(int a, int b) =>a < b ? a : b;
+            var index= 0;
+            if(BurstHelpers.IsV256Supported){
+                static v256 _min256(v256 a, int* b) => new v256(
+                        _min(a.SInt0, b[0]),
+                        _min(a.SInt1, b[1]),
+                        _min(a.SInt2, b[2]),
+                        _min(a.SInt3, b[3]),
+                        _min(a.SInt4, b[4]),
+                        _min(a.SInt5, b[5]),
+                        _min(a.SInt6, b[6]),
+                        _min(a.SInt7, b[7])
+                );
+                
+                var packingLength = sizeof(v256) / sizeof(int);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v256(int.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min256(temp, ptr+index);
                     }
-                for (int index=l*(32 / sizeof(int)); index < length; index++)
-                {
-                        result = math.min(result, ptr[index]);
+                    int* tempAsArray = (int*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
                     }
-            }
-            else {
-                    var index = 0;
-                var result4 = new int4(int.MaxValue, int.MaxValue, int.MaxValue, int.MaxValue);
-                var l = length / 4;
-                for (; index < l; index += 4)
-                {
-                    result4 = math.min(result4, *(int4*)(ptr + index));
+                }    
+             }else if(BurstHelpers.IsV128Supported){
+                static v128 _min128(v128 a, int* b) => new v128(
+                    _min(a.SInt0, b[0]),
+                    _min(a.SInt1, b[1]),
+                    _min(a.SInt2, b[2]),
+                    _min(a.SInt3, b[3])
+                );
+                
+                var packingLength = sizeof(v128) / sizeof(int);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v128(int.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min128(temp, ptr+index);
+                    }
+                    int* tempAsArray = (int*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
+                    }
                 }
-
-                result = math.cmin(result4);
-                for (; index < length; index++)
-                {
-                    result = math.min(result, ptr[index]);
-                }
-            }
+             }
+             for (; index < length; index++) {
+                 tempResult = _min(tempResult, ptr[index]);
+             }
+             result =  tempResult;
+           
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _min(tempResult, ptr[i]);
+             }
+             result = tempResult;
         }
-                 public static uint Min(this NativeList<uint> source)
+         public static uint Min(this NativeList<uint> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MinCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -287,40 +540,66 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MinCore(uint* ptr, [AssumeRange(1, int.MaxValue)] int length, out uint result)
         {
-         if (IsAvx2Supported) {
-                var temp = new v256(uint.MaxValue);
-                var l = length / (32 / sizeof(uint));
-                var ptrAs256 = (v256*) ptr;
-                for (int i = 0; i < l; i++) {
-                    temp = mm256_min_epu32(temp, ptrAs256[i]);
-                }
-                result = uint.MaxValue;
-                var tempAsArray = (uint*)&temp;
-                for (int i = 0; i < 32 / sizeof(uint); i++) {
-                        result = math.min(result, tempAsArray[i]);
+            var tempResult = uint.MaxValue;
+              static uint _min(uint a, uint b) =>a < b ? a : b;
+            var index= 0;
+            if(BurstHelpers.IsV256Supported){
+                static v256 _min256(v256 a, uint* b) => new v256(
+                        _min(a.UInt0, b[0]),
+                        _min(a.UInt1, b[1]),
+                        _min(a.UInt2, b[2]),
+                        _min(a.UInt3, b[3]),
+                        _min(a.UInt4, b[4]),
+                        _min(a.UInt5, b[5]),
+                        _min(a.UInt6, b[6]),
+                        _min(a.UInt7, b[7])
+                );
+                
+                var packingLength = sizeof(v256) / sizeof(uint);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v256(uint.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min256(temp, ptr+index);
                     }
-                for (int index=l*(32 / sizeof(uint)); index < length; index++)
-                {
-                        result = math.min(result, ptr[index]);
+                    uint* tempAsArray = (uint*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
                     }
-            }
-            else {
-                    var index = 0;
-                var result4 = new uint4(uint.MaxValue, uint.MaxValue, uint.MaxValue, uint.MaxValue);
-                var l = length / 4;
-                for (; index < l; index += 4)
-                {
-                    result4 = math.min(result4, *(uint4*)(ptr + index));
+                }    
+             }else if(BurstHelpers.IsV128Supported){
+                static v128 _min128(v128 a, uint* b) => new v128(
+                    _min(a.UInt0, b[0]),
+                    _min(a.UInt1, b[1]),
+                    _min(a.UInt2, b[2]),
+                    _min(a.UInt3, b[3])
+                );
+                
+                var packingLength = sizeof(v128) / sizeof(uint);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v128(uint.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min128(temp, ptr+index);
+                    }
+                    uint* tempAsArray = (uint*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
+                    }
                 }
-
-                result = math.cmin(result4);
-                for (; index < length; index++)
-                {
-                    result = math.min(result, ptr[index]);
-                }
-            }
+             }
+             for (; index < length; index++) {
+                 tempResult = _min(tempResult, ptr[index]);
+             }
+             result =  tempResult;
+           
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _min(tempResult, ptr[i]);
+             }
+             result = tempResult;
         }
-                 public static long Min(this NativeList<long> source)
+         public static long Min(this NativeList<long> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MinCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -343,14 +622,60 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MinCore(long* ptr, [AssumeRange(1, int.MaxValue)] int length, out long result)
         {
-            static long localMin(long a, long b) => a < b ? a : b;
-            result = long.MaxValue;
-            for (int i = 0; i < length; i++)
-            {
-                result = localMin(result, ptr[i]);
-            }
+            var tempResult = long.MaxValue;
+              static long _min(long a, long b) =>a < b ? a : b;
+            var index= 0;
+            if(BurstHelpers.IsV256Supported){
+                static v256 _min256(v256 a, long* b) => new v256(
+                        _min(a.SLong0, b[0]),
+                        _min(a.SLong1, b[1]),
+                        _min(a.SLong2, b[2]),
+                        _min(a.SLong3, b[3])
+                );
+                
+                var packingLength = sizeof(v256) / sizeof(long);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v256(long.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min256(temp, ptr+index);
+                    }
+                    long* tempAsArray = (long*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
+                    }
+                }    
+             }else if(BurstHelpers.IsV128Supported){
+                static v128 _min128(v128 a, long* b) => new v128(
+                    _min(a.SLong0, b[0]),
+                    _min(a.SLong1, b[1])
+                );
+                
+                var packingLength = sizeof(v128) / sizeof(long);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v128(long.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min128(temp, ptr+index);
+                    }
+                    long* tempAsArray = (long*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
+                    }
+                }
+             }
+             for (; index < length; index++) {
+                 tempResult = _min(tempResult, ptr[index]);
+             }
+             result =  tempResult;
+           
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _min(tempResult, ptr[i]);
+             }
+             result = tempResult;
         }
-             public static ulong Min(this NativeList<ulong> source)
+         public static ulong Min(this NativeList<ulong> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MinCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -373,14 +698,60 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MinCore(ulong* ptr, [AssumeRange(1, int.MaxValue)] int length, out ulong result)
         {
-            static ulong localMin(ulong a, ulong b) => a < b ? a : b;
-            result = ulong.MaxValue;
-            for (int i = 0; i < length; i++)
-            {
-                result = localMin(result, ptr[i]);
-            }
+            var tempResult = ulong.MaxValue;
+              static ulong _min(ulong a, ulong b) =>a < b ? a : b;
+            var index= 0;
+            if(BurstHelpers.IsV256Supported){
+                static v256 _min256(v256 a, ulong* b) => new v256(
+                        _min(a.ULong0, b[0]),
+                        _min(a.ULong1, b[1]),
+                        _min(a.ULong2, b[2]),
+                        _min(a.ULong3, b[3])
+                );
+                
+                var packingLength = sizeof(v256) / sizeof(ulong);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v256(ulong.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min256(temp, ptr+index);
+                    }
+                    ulong* tempAsArray = (ulong*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
+                    }
+                }    
+             }else if(BurstHelpers.IsV128Supported){
+                static v128 _min128(v128 a, ulong* b) => new v128(
+                    _min(a.ULong0, b[0]),
+                    _min(a.ULong1, b[1])
+                );
+                
+                var packingLength = sizeof(v128) / sizeof(ulong);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v128(ulong.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min128(temp, ptr+index);
+                    }
+                    ulong* tempAsArray = (ulong*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
+                    }
+                }
+             }
+             for (; index < length; index++) {
+                 tempResult = _min(tempResult, ptr[index]);
+             }
+             result =  tempResult;
+           
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _min(tempResult, ptr[i]);
+             }
+             result = tempResult;
         }
-             public static float Min(this NativeList<float> source)
+         public static float Min(this NativeList<float> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MinCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -403,40 +774,66 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MinCore(float* ptr, [AssumeRange(1, int.MaxValue)] int length, out float result)
         {
-         if (IsAvxSupported) {
-                var temp = new v256(float.MaxValue);
-                var l = length / (32 / sizeof(float));
-                var ptrAs256 = (v256*) ptr;
-                for (int i = 0; i < l; i++) {
-                    temp = mm256_min_ps(temp, ptrAs256[i]);
-                }
-                result = float.MaxValue;
-                var tempAsArray = (float*)&temp;
-                for (int i = 0; i < 32 / sizeof(float); i++) {
-                        result = math.min(result, tempAsArray[i]);
+            var tempResult = float.MaxValue;
+            static float _min(float a, float b) =>IsNeonSupported?math.min(a,b): a < b ? a : b;
+            var index= 0;
+            if(BurstHelpers.IsV256Supported){
+                static v256 _min256(v256 a, float* b) => new v256(
+                        _min(a.Float0, b[0]),
+                        _min(a.Float1, b[1]),
+                        _min(a.Float2, b[2]),
+                        _min(a.Float3, b[3]),
+                        _min(a.Float4, b[4]),
+                        _min(a.Float5, b[5]),
+                        _min(a.Float6, b[6]),
+                        _min(a.Float7, b[7])
+                );
+                
+                var packingLength = sizeof(v256) / sizeof(float);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v256(float.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min256(temp, ptr+index);
                     }
-                for (int index=l*(32 / sizeof(float)); index < length; index++)
-                {
-                        result = math.min(result, ptr[index]);
+                    float* tempAsArray = (float*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
                     }
-            }
-            else {
-                    var index = 0;
-                var result4 = new float4(float.MaxValue, float.MaxValue, float.MaxValue, float.MaxValue);
-                var l = length / 4;
-                for (; index < l; index += 4)
-                {
-                    result4 = math.min(result4, *(float4*)(ptr + index));
+                }    
+             }else if(BurstHelpers.IsV128Supported){
+                static v128 _min128(v128 a, float* b) => new v128(
+                    _min(a.Float0, b[0]),
+                    _min(a.Float1, b[1]),
+                    _min(a.Float2, b[2]),
+                    _min(a.Float3, b[3])
+                );
+                
+                var packingLength = sizeof(v128) / sizeof(float);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v128(float.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min128(temp, ptr+index);
+                    }
+                    float* tempAsArray = (float*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
+                    }
                 }
-
-                result = math.cmin(result4);
-                for (; index < length; index++)
-                {
-                    result = math.min(result, ptr[index]);
-                }
-            }
+             }
+             for (; index < length; index++) {
+                 tempResult = _min(tempResult, ptr[index]);
+             }
+             result =  tempResult;
+           
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _min(tempResult, ptr[i]);
+             }
+             result = tempResult;
         }
-                 public static double Min(this NativeList<double> source)
+         public static double Min(this NativeList<double> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MinCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -459,38 +856,59 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MinCore(double* ptr, [AssumeRange(1, int.MaxValue)] int length, out double result)
         {
-         if (IsAvxSupported) {
-                var temp = new v256(double.MaxValue);
-                var l = length / (32 / sizeof(double));
-                var ptrAs256 = (v256*) ptr;
-                for (int i = 0; i < l; i++) {
-                    temp = mm256_min_pd(temp, ptrAs256[i]);
-                }
-                result = double.MaxValue;
-                var tempAsArray = (double*)&temp;
-                for (int i = 0; i < 32 / sizeof(double); i++) {
-                        result = math.min(result, tempAsArray[i]);
+            var tempResult = double.MaxValue;
+            static double _min(double a, double b) =>IsNeonSupported?math.min(a,b): a < b ? a : b;
+            var index= 0;
+            if(BurstHelpers.IsV256Supported){
+                static v256 _min256(v256 a, double* b) => new v256(
+                        _min(a.Double0, b[0]),
+                        _min(a.Double1, b[1]),
+                        _min(a.Double2, b[2]),
+                        _min(a.Double3, b[3])
+                );
+                
+                var packingLength = sizeof(v256) / sizeof(double);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v256(double.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min256(temp, ptr+index);
                     }
-                for (int index=l*(32 / sizeof(double)); index < length; index++)
-                {
-                        result = math.min(result, ptr[index]);
+                    double* tempAsArray = (double*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
                     }
-            }
-            else {
-                    var index = 0;
-                var result4 = new double4(double.MaxValue, double.MaxValue, double.MaxValue, double.MaxValue);
-                var l = length / 4;
-                for (; index < l; index += 4)
-                {
-                    result4 = math.min(result4, *(double4*)(ptr + index));
+                }    
+             }else if(BurstHelpers.IsV128Supported){
+                static v128 _min128(v128 a, double* b) => new v128(
+                    _min(a.Double0, b[0]),
+                    _min(a.Double1, b[1])
+                );
+                
+                var packingLength = sizeof(v128) / sizeof(double);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v128(double.MaxValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _min128(temp, ptr+index);
+                    }
+                    double* tempAsArray = (double*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _min(tempResult, tempAsArray[i]);
+                    }
                 }
-
-                result = math.cmin(result4);
-                for (; index < length; index++)
-                {
-                    result = math.min(result, ptr[index]);
-                }
-            }
+             }
+             for (; index < length; index++) {
+                 tempResult = _min(tempResult, ptr[index]);
+             }
+             result =  tempResult;
+           
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _min(tempResult, ptr[i]);
+             }
+             result = tempResult;
         }
+        
     }
 }

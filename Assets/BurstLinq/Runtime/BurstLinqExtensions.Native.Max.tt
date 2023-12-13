@@ -10,45 +10,45 @@
         "byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", "float", "double"
     };
 
-    bool IsVectorSupported(string type)
-    {
-        return type is "int" or "uint" or "float" or "double";
-    }
-   
-    bool IsMinMaxSupported(string type)
-    {
-        return type is "byte" or "sbyte" or "short" or "ushort" or "int" or "uint"  or "float" or "double";
-    }
-
-    string AVXSupportCheck(string type) {
-        if (type is "byte" or "sbyte" or "short" or "ushort" or "int" or "uint" or "long" or "ulong") {
-            return "IsAvx2Supported";
-        }else if (type is "float" or "double") {
-            return "IsAvxSupported";
-        }
-        throw new Exception("Invalid type");
-    }
-    string IntrinsicsName(string type) {
+    string V256Name(string type) {
         switch (@type) {
-            case "sbyte": return "epi8";
-            case "byte": return "epu8";
-            case "short": return "epi16";
-            case "ushort": return "epu16";
-            case "int": return "epi32";
-            case "uint": return "epu32";
-            case "long": return "epi64";
-            case "ulong": return "epu64";
-            case "float": return "ps";
-            case "double": return "pd";
+            case "sbyte": return "SByte";
+            case "byte": return "Byte";
+            case "short": return "SShort";
+            case "ushort": return "UShort";
+            case "int": return "SInt";
+            case "uint": return "UInt";
+            case "long": return "SLong";
+            case "ulong": return "ULong";
+            case "float": return "Float";
+            case "double": return "Double";
         }
         throw new Exception("Invalid type");
+    }
+    int Size(string type) {
+        switch (@type) {
+            case "sbyte": return 1;
+            case "byte": return 1;
+            case "short": return 2;
+            case "ushort": return 2;
+            case "int": return 4;
+            case "uint": return 4;
+            case "long": return 8;
+            case "ulong": return 8;
+            case "float": return 4;
+            case "double": return 8;
+        }
+        throw new Exception("Invalid type");
+    }
+    bool IsFloating(string type) {
+        return type is "float" or "double";
     }
 #>
 using Unity.Burst;
 using Unity.Burst.CompilerServices;
 using Unity.Burst.Intrinsics;
-using static Unity.Burst.Intrinsics.X86.Avx;
-using static Unity.Burst.Intrinsics.X86.Avx2;
+using System.Runtime.CompilerServices;
+using static Unity.Burst.Intrinsics.Arm.Neon;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
@@ -79,74 +79,70 @@ namespace BurstLinq
             MaxCore((<#=type#>*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-<#if (IsMinMaxSupported(type)) { #>
-        [BurstCompile]
-        internal static void MaxCore(<#=type#>* ptr, [AssumeRange(1, int.MaxValue)] int length, out <#=type#> result)
-        {
-         if (<#=AVXSupportCheck(type)#>) {
-                var temp = new v256(<#=type#>.MinValue);
-                var l = length / (32 / sizeof(<#=type#>));
-                var ptrAs256 = (v256*) ptr;
-                for (int i = 0; i < l; i++) {
-                    temp = mm256_max_<#=IntrinsicsName(type)#>(temp, ptrAs256[i]);
-                }
-                result = <#=type#>.MinValue;
-                var tempAsArray = (<#=type#>*)&temp;
-                for (int i = 0; i < 32 / sizeof(<#=type#>); i++) {
-<#if (IsVectorSupported(type)) { #>
-                    result = math.max(result, tempAsArray[i]);
- <#} else { #>
-                    if (result < tempAsArray[i]) result = tempAsArray[i];
-<# } #>
-                }
-                for (int index=l*(32 / sizeof(<#=type#>)); index < length; index++)
-                {
-<#if (IsVectorSupported(type)) { #>
-                    result = math.max(result, ptr[index]);
-<#} else { #>
-                    if (result < ptr[index]) result = ptr[index];
-<# } #>
-                }
-            }
-        else {
-<#if (IsVectorSupported(type)) { #>
-                var index = 0;
-                var result4 = new <#=type#>4(<#=type#>.MinValue, <#=type#>.MinValue, <#=type#>.MinValue, <#=type#>.MinValue);
-                var l = length / 4;
-                for (; index < l; index += 4)
-                {
-                    result4 = math.max(result4, *(<#=type#>4*)(ptr + index));
-                }
 
-                result = math.cmax(result4);
-                for (; index < length; index++)
-                {
-                    result = math.max(result, ptr[index]);
-                }
-            }
-        }
-<#} else { #>
-                static <#=type#> localMax(<#=type#> a, <#=type#> b) => a > b ? a : b;
-                result = <#=type#>.MinValue;
-                for (int i = 0; i < length; i++)
-                {
-                   result = localMax(result, ptr[i]);
-                }
-            }
-        }
-<# } #>
-<#} else { #>
         [BurstCompile]
         internal static void MaxCore(<#=type#>* ptr, [AssumeRange(1, int.MaxValue)] int length, out <#=type#> result)
         {
-            static <#=type#> localMax(<#=type#> a, <#=type#> b) => a > b ? a : b;
-            result = <#=type#>.MaxValue;
-            for (int i = 0; i < length; i++)
-            {
-                result = localMax(result, ptr[i]);
-            }
-        }
+            var tempResult = <#=type#>.MinValue;
+<# if (IsFloating(type)) {#>
+            static <#=type#> _max(<#=type#> a, <#=type#> b) =>IsNeonSupported?math.max(a,b): a > b ? a : b;
+            
+            var index= 0;
+            if(BurstHelpers.IsV256Supported){
+                static v256 _max256(v256 a, <#=type#>* b) => new v256(
+    <# int vectorLength=32/Size(type);string typeName = V256Name(type);
+    for (int i =0;i<vectorLength-1;i++) {#>
+                    _max(a.<#=typeName+i#>, b[<#=i#>]),
+    <# } #>
+                    _max(a.<#=typeName+(vectorLength-1)#>, b[<#=(vectorLength-1)#>])
+                );
+                
+                var packingLength = sizeof(v256) / sizeof(<#=type#>);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v256(<#=type#>.MinValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _max256(temp, (ptr+index));
+                    }
+                    <#=type#>* tempAsArray = (<#=type#>*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _max(tempResult, tempAsArray[i]);
+                    }
+                }    
+             }else if(BurstHelpers.IsV128Supported){
+                static v128 _max128(v128 a, <#=type#>* b) => new v128(
+<# for (int i =0;i<vectorLength/2-1;i++) {#>
+                    _max(a.<#=typeName+i#>, b[<#=i#>]),
 <# } #>
+                    _max(a.<#=typeName+(vectorLength/2-1)#>, b[<#=(vectorLength/2-1)#>])
+                );
+                
+                var packingLength = sizeof(v128) / sizeof(<#=type#>);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v128(<#=type#>.MinValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _max128(temp, (ptr+index));
+                    }
+                    <#=type#>* tempAsArray = (<#=type#>*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _max(tempResult, tempAsArray[i]);
+                    }
+                }
+             }
+             for (; index < length; index++) {
+                 tempResult = _max(tempResult, ptr[index]);
+             }
+             result =  tempResult;
+<# } else {#>
+             static <#=type#> _max(<#=type#> a, <#=type#> b) =>a > b ? a : b;
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _max(tempResult, ptr[i]);
+             }
+             result = tempResult;
+<# } #>
+        }
 <# } #>
     }
 }
