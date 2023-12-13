@@ -29,14 +29,13 @@ namespace BurstLinq
             SumCore((int*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(int* ptr, [AssumeRange(1, int.MaxValue)] int length, out int result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            var sum = default(int);
+            for (int i = 0; i < length; i++) sum += ptr[i];
+            result = sum;
         }
-
         public static uint Sum(this NativeList<uint> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -57,14 +56,13 @@ namespace BurstLinq
             SumCore((uint*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(uint* ptr, [AssumeRange(1, int.MaxValue)] int length, out uint result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            var sum = default(uint);
+            for (int i = 0; i < length; i++) sum += ptr[i];
+            result = sum;
         }
-
         public static long Sum(this NativeList<long> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -85,14 +83,13 @@ namespace BurstLinq
             SumCore((long*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(long* ptr, [AssumeRange(1, int.MaxValue)] int length, out long result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            var sum = default(long);
+            for (int i = 0; i < length; i++) sum += ptr[i];
+            result = sum;
         }
-
         public static ulong Sum(this NativeList<ulong> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -113,14 +110,13 @@ namespace BurstLinq
             SumCore((ulong*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(ulong* ptr, [AssumeRange(1, int.MaxValue)] int length, out ulong result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            var sum = default(ulong);
+            for (int i = 0; i < length; i++) sum += ptr[i];
+            result = sum;
         }
-
         public static float Sum(this NativeList<float> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -141,14 +137,13 @@ namespace BurstLinq
             SumCore((float*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(float* ptr, [AssumeRange(1, int.MaxValue)] int length, out float result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            var sum = default(float);
+            for (int i = 0; i < length; i++) sum += ptr[i];
+            result = sum;
         }
-
         public static double Sum(this NativeList<double> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -169,14 +164,13 @@ namespace BurstLinq
             SumCore((double*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(double* ptr, [AssumeRange(1, int.MaxValue)] int length, out double result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            var sum = default(double);
+            for (int i = 0; i < length; i++) sum += ptr[i];
+            result = sum;
         }
-
         public static Vector2 Sum(this NativeList<Vector2> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -197,14 +191,14 @@ namespace BurstLinq
             SumCore((Vector2*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(Vector2* ptr, [AssumeRange(1, int.MaxValue)] int length, out Vector2 result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            SumCore((float4*)ptr, length  / 2, out var sum2);
+            Vector2 sum = new Vector2(sum2.x+sum2.z, sum2.y+ sum2.w);
+            if (length%2==1) sum += ptr[length-1];
+            result = sum;
         }
-
         public static Vector2Int Sum(this NativeList<Vector2Int> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -225,14 +219,14 @@ namespace BurstLinq
             SumCore((Vector2Int*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(Vector2Int* ptr, [AssumeRange(1, int.MaxValue)] int length, out Vector2Int result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            SumCore((int4*)ptr, length  / 2, out var sum2);
+            Vector2Int sum = new Vector2Int(sum2.x+sum2.z, sum2.y+ sum2.w);
+            if (length%2==1) sum += ptr[length-1];
+            result = sum;
         }
-
         public static Vector3 Sum(this NativeList<Vector3> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -253,14 +247,13 @@ namespace BurstLinq
             SumCore((Vector3*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(Vector3* ptr, [AssumeRange(1, int.MaxValue)] int length, out Vector3 result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            var sum = default(Vector3);
+            for (int i = 0; i < length; i++) sum += ptr[i];
+            result = sum;
         }
-
         public static Vector3Int Sum(this NativeList<Vector3Int> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -281,14 +274,13 @@ namespace BurstLinq
             SumCore((Vector3Int*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(Vector3Int* ptr, [AssumeRange(1, int.MaxValue)] int length, out Vector3Int result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            var sum = default(Vector3Int);
+            for (int i = 0; i < length; i++) sum += ptr[i];
+            result = sum;
         }
-
         public static Vector4 Sum(this NativeList<Vector4> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -309,14 +301,13 @@ namespace BurstLinq
             SumCore((Vector4*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(Vector4* ptr, [AssumeRange(1, int.MaxValue)] int length, out Vector4 result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            var sum = default(Vector4);
+            for (int i = 0; i < length; i++) sum += ptr[i];
+            result = sum;
         }
-
         public static int2 Sum(this NativeList<int2> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -337,14 +328,14 @@ namespace BurstLinq
             SumCore((int2*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(int2* ptr, [AssumeRange(1, int.MaxValue)] int length, out int2 result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            SumCore((int4*)ptr, length  / 2, out var sum2);
+            int2 sum = new int2(sum2.x+sum2.z, sum2.y+ sum2.w);
+            if (length%2==1) sum += ptr[length-1];
+            result = sum;
         }
-
         public static int3 Sum(this NativeList<int3> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -365,14 +356,13 @@ namespace BurstLinq
             SumCore((int3*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(int3* ptr, [AssumeRange(1, int.MaxValue)] int length, out int3 result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            var sum = default(int3);
+            for (int i = 0; i < length; i++) sum += ptr[i];
+            result = sum;
         }
-
         public static int4 Sum(this NativeList<int4> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -393,14 +383,13 @@ namespace BurstLinq
             SumCore((int4*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(int4* ptr, [AssumeRange(1, int.MaxValue)] int length, out int4 result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            var sum = default(int4);
+            for (int i = 0; i < length; i++) sum += ptr[i];
+            result = sum;
         }
-
         public static uint2 Sum(this NativeList<uint2> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -421,14 +410,14 @@ namespace BurstLinq
             SumCore((uint2*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(uint2* ptr, [AssumeRange(1, int.MaxValue)] int length, out uint2 result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            SumCore((uint4*)ptr, length  / 2, out var sum2);
+            uint2 sum = new uint2(sum2.x+sum2.z, sum2.y+ sum2.w);
+            if (length%2==1) sum += ptr[length-1];
+            result = sum;
         }
-
         public static uint3 Sum(this NativeList<uint3> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -449,14 +438,13 @@ namespace BurstLinq
             SumCore((uint3*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(uint3* ptr, [AssumeRange(1, int.MaxValue)] int length, out uint3 result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            var sum = default(uint3);
+            for (int i = 0; i < length; i++) sum += ptr[i];
+            result = sum;
         }
-
         public static uint4 Sum(this NativeList<uint4> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -477,14 +465,13 @@ namespace BurstLinq
             SumCore((uint4*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(uint4* ptr, [AssumeRange(1, int.MaxValue)] int length, out uint4 result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            var sum = default(uint4);
+            for (int i = 0; i < length; i++) sum += ptr[i];
+            result = sum;
         }
-
         public static float2 Sum(this NativeList<float2> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -505,14 +492,14 @@ namespace BurstLinq
             SumCore((float2*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(float2* ptr, [AssumeRange(1, int.MaxValue)] int length, out float2 result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            SumCore((float4*)ptr, length  / 2, out var sum2);
+            float2 sum = new float2(sum2.x+sum2.z, sum2.y+ sum2.w);
+            if (length%2==1) sum += ptr[length-1];
+            result = sum;
         }
-
         public static float3 Sum(this NativeList<float3> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -533,14 +520,13 @@ namespace BurstLinq
             SumCore((float3*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(float3* ptr, [AssumeRange(1, int.MaxValue)] int length, out float3 result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            var sum = default(float3);
+            for (int i = 0; i < length; i++) sum += ptr[i];
+            result = sum;
         }
-
         public static float4 Sum(this NativeList<float4> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -561,14 +547,13 @@ namespace BurstLinq
             SumCore((float4*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(float4* ptr, [AssumeRange(1, int.MaxValue)] int length, out float4 result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            var sum = default(float4);
+            for (int i = 0; i < length; i++) sum += ptr[i];
+            result = sum;
         }
-
         public static double2 Sum(this NativeList<double2> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -589,14 +574,14 @@ namespace BurstLinq
             SumCore((double2*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(double2* ptr, [AssumeRange(1, int.MaxValue)] int length, out double2 result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            SumCore((double4*)ptr, length  / 2, out var sum2);
+            double2 sum = new double2(sum2.x+sum2.z, sum2.y+ sum2.w);
+            if (length%2==1) sum += ptr[length-1];
+            result = sum;
         }
-
         public static double3 Sum(this NativeList<double3> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -617,14 +602,13 @@ namespace BurstLinq
             SumCore((double3*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(double3* ptr, [AssumeRange(1, int.MaxValue)] int length, out double3 result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            var sum = default(double3);
+            for (int i = 0; i < length; i++) sum += ptr[i];
+            result = sum;
         }
-
         public static double4 Sum(this NativeList<double4> source)
         {
             Error.ThrowIfEmpty(source.Length);
@@ -645,13 +629,12 @@ namespace BurstLinq
             SumCore((double4*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(double4* ptr, [AssumeRange(1, int.MaxValue)] int length, out double4 result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            var sum = default(double4);
+            for (int i = 0; i < length; i++) sum += ptr[i];
+            result = sum;
         }
-
     }
 }

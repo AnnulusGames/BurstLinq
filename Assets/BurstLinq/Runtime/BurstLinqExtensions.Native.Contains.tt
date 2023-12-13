@@ -14,19 +14,77 @@
         "float2", "float3", "float4",
         "double2", "double3", "double4",
     };
-
-    bool IsPrimitiveAndVectorSupported(string type)
+    bool IsPrimitive(string type)
     {
-        return type is "int" or "uint" or "float" or "double";
+        return type is  "byte"or  "sbyte"or  "short"or  "ushort"or "int" or "uint" or "float" or "double" or "long" or "ulong";
+    }
+    
+    string V256Name(string type) {
+        switch (@type) {
+            case "sbyte": return "SByte";
+            case "byte": return "Byte";
+            case "short": return "SShort";
+            case "ushort": return "UShort";
+            case "int": return "SInt";
+            case "uint": return "UInt";
+            case "long": return "SLong";
+            case "ulong": return "ULong";
+            case "float": return "Float";
+            case "double": return "Double";
+        }
+        throw new Exception("Invalid type");
+    }
+    int Size(string type) {
+        switch (@type) {
+            case "sbyte": return 1;
+            case "byte": return 1;
+            case "short": return 2;
+            case "ushort": return 2;
+            case "int": return 4;
+            case "uint": return 4;
+            case "long": return 8;
+            case "ulong": return 8;
+            case "float": return 4;
+            case "double": return 8;
+            case "Vector2": return sizeof(float) * 2;
+            case "Vector2Int": return sizeof(int) * 2;
+            case "Vector3": return sizeof(float) * 3;
+            case "Vector3Int": return sizeof(int) * 3;
+            case "Vector4": return sizeof(float) * 4;
+            case "int2": return sizeof(int) * 2;
+            case "int3": return sizeof(int) * 3;
+            case "int4": return sizeof(int) * 4;
+            case "uint2": return sizeof(uint) * 2;
+            case "uint3": return sizeof(uint) * 3;
+            case "uint4": return sizeof(uint) * 4;
+            case "float2": return sizeof(float) * 2;
+            case "float3": return sizeof(float) * 3;
+            case "float4": return sizeof(float) * 4;
+            case "double2": return sizeof(double) * 2;
+            case "double3": return sizeof(double) * 3;
+            case "double4": return sizeof(double) * 4;
+        }
+        throw new Exception("Invalid type");
+    }
+    bool TryGetInteger(string type, out string type2) {
+        type2 = null;
+        switch (type) {
+            case "int2": type2 = "long"; return true;
+            case "uint2": type2 = "long"; return true;
+            case "Vector2Int": type2 = "long"; return true;
+            default: return false;
+        
+        }
     }
 #>
 using Unity.Burst;
 using Unity.Burst.CompilerServices;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using UnityEngine;
-
+using System.Runtime.CompilerServices;
 namespace BurstLinq
 {
     public unsafe static partial class BurstLinqExtensions
@@ -37,7 +95,7 @@ namespace BurstLinq
             return ContainsCore(source.GetUnsafePtr(), source.Length, value);
         }
 
-        public unsafe static bool Contains(this NativeSlice<<#=type#>> source, <#=type#> value)
+        public  static bool Contains(this NativeSlice<<#=type#>> source, <#=type#> value)
         {
             return ContainsCore((<#=type#>*)source.GetUnsafePtr(), source.Length, value);
         }
@@ -46,30 +104,58 @@ namespace BurstLinq
         {
             return ContainsCore((<#=type#>*)source.GetUnsafePtr(), source.Length, value);
         }
-
-<#if (IsPrimitiveAndVectorSupported(type)) { #>
+<#if (TryGetInteger(type,out var intType)){#>
+        internal static bool ContainsCore(<#=type#>* ptr, [AssumeRange(1, int.MaxValue)] int length, in <#=type#> value)
+        {
+            var temp=value;
+            var union=*(<#=intType#>*)&temp;
+           return ContainsCore((<#=intType#>*)ptr,length,union);
+        }
+<#} else if (IsPrimitive(type)) { #>
+<#var vName = V256Name(type);#>
         [BurstCompile]
         internal static bool ContainsCore(<#=type#>* ptr, [AssumeRange(1, int.MaxValue)] int length, in <#=type#> value)
         {
-            var index = 0;
-            var value4 = new <#=type#>4(value, value, value, value);
-            var l = length / 4;
-            for (; index < l; index += 4)
-            {
-                var c = value4 == *(<#=type#>4*)(ptr + index);
-                if (math.any(c)) return true;
-            }
+             var index= 0;
+            if(BurstHelpers.IsV256Supported){
+                const int packingLength = 32 / sizeof(<#=type#>);
 
-            for (; index < length; index++)
-            {
-                if (ptr[index].Equals(value)) return true;
+ <# int vectorLength=32/Size(type);string typeName = V256Name(type);#>
+                 static bool<#=vectorLength#> _contains(v256 a, <#=type#>* b) => new bool<#=vectorLength#>(
+ <# for (int i =0;i<vectorLength-1;i++) {#>
+                    a.<#=typeName+i#>== b[<#=i#>],
+<# } #>
+                    a.<#=typeName+(vectorLength-1)#>== b[<#=vectorLength-1#>]);
+                
+                if(0<length / packingLength) {
+                    var valueVector = new v256(value);
+                    for (; index < length-packingLength; index += packingLength) {
+                        if(_contains(valueVector, ptr + index).any()) return true;
+                    }
+                }
+            }else if(BurstHelpers.IsV128Supported){
+                const int packingLength = 16 / sizeof(<#=type#>);
+              
+                static bool<#=vectorLength/2#> _contains(v128 a, <#=type#>* b)  =>new bool<#=vectorLength/2#>(
+ <# for (int i =0;i<vectorLength/2-1;i++) {#>
+                    a.<#=typeName+i#>== b[<#=i#>],
+<# } #>
+                    a.<#=typeName+(vectorLength/2-1)#>== b[<#=vectorLength/2-1#>]);
+                if(0<length / packingLength) {
+                    var valueVector = new v128(value);
+                    for (; index < length-packingLength; index += packingLength) {
+                        if(_contains(valueVector, ptr + index).any()) return true;
+                    }
+                }
             }
-
+            for (; index < length; index++) {
+                if (ptr[index]==value) return true;
+            }
             return false;
         }
 <#} else { #>
         [BurstCompile]
-        internal unsafe static bool ContainsCore(<#=type#>* ptr, [AssumeRange(0, int.MaxValue)] int length, in <#=type#> value)
+        internal  static bool ContainsCore(<#=type#>* ptr, [AssumeRange(0, int.MaxValue)] int length, in <#=type#> value)
         {
             for (int i = 0; i < length; i++)
             {
@@ -79,7 +165,6 @@ namespace BurstLinq
             return false;
         }
 <# } #>
-
 <# } #>
     }
 }

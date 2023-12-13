@@ -1,14 +1,18 @@
 using Unity.Burst;
 using Unity.Burst.CompilerServices;
+using Unity.Burst.Intrinsics;
+using System.Runtime.CompilerServices;
+using static Unity.Burst.Intrinsics.Arm.Neon;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 
 namespace BurstLinq
-{
+{  
+
     public unsafe static partial class BurstLinqExtensions
     {
-        public static byte Max(this NativeList<byte> source)
+         public static byte Max(this NativeList<byte> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MaxCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -32,14 +36,15 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MaxCore(byte* ptr, [AssumeRange(1, int.MaxValue)] int length, out byte result)
         {
-            result = byte.MinValue;
-            for (int i = 0; i < length; i++)
-            {
-                if (result > ptr[i]) result = ptr[i];
-            }
+            var tempResult = byte.MinValue;
+             static byte _max(byte a, byte b) =>a > b ? a : b;
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _max(tempResult, ptr[i]);
+             }
+             result = tempResult;
         }
-
-        public static sbyte Max(this NativeList<sbyte> source)
+         public static sbyte Max(this NativeList<sbyte> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MaxCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -63,14 +68,15 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MaxCore(sbyte* ptr, [AssumeRange(1, int.MaxValue)] int length, out sbyte result)
         {
-            result = sbyte.MinValue;
-            for (int i = 0; i < length; i++)
-            {
-                if (result > ptr[i]) result = ptr[i];
-            }
+            var tempResult = sbyte.MinValue;
+             static sbyte _max(sbyte a, sbyte b) =>a > b ? a : b;
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _max(tempResult, ptr[i]);
+             }
+             result = tempResult;
         }
-
-        public static short Max(this NativeList<short> source)
+         public static short Max(this NativeList<short> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MaxCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -94,14 +100,15 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MaxCore(short* ptr, [AssumeRange(1, int.MaxValue)] int length, out short result)
         {
-            result = short.MinValue;
-            for (int i = 0; i < length; i++)
-            {
-                if (result > ptr[i]) result = ptr[i];
-            }
+            var tempResult = short.MinValue;
+             static short _max(short a, short b) =>a > b ? a : b;
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _max(tempResult, ptr[i]);
+             }
+             result = tempResult;
         }
-
-        public static ushort Max(this NativeList<ushort> source)
+         public static ushort Max(this NativeList<ushort> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MaxCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -125,14 +132,15 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MaxCore(ushort* ptr, [AssumeRange(1, int.MaxValue)] int length, out ushort result)
         {
-            result = ushort.MinValue;
-            for (int i = 0; i < length; i++)
-            {
-                if (result > ptr[i]) result = ptr[i];
-            }
+            var tempResult = ushort.MinValue;
+             static ushort _max(ushort a, ushort b) =>a > b ? a : b;
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _max(tempResult, ptr[i]);
+             }
+             result = tempResult;
         }
-
-        public static int Max(this NativeList<int> source)
+         public static int Max(this NativeList<int> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MaxCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -156,22 +164,15 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MaxCore(int* ptr, [AssumeRange(1, int.MaxValue)] int length, out int result)
         {
-            var index = 0;
-            var result4 = new int4(int.MinValue, int.MinValue, int.MinValue, int.MinValue);
-            var l = length / 4;
-            for (; index < l; index += 4)
-            {
-                result4 = math.max(result4, *(int4*)(ptr + index));
-            }
-
-            result = math.cmax(result4);
-            for (; index < length; index++)
-            {
-                result = math.max(result, ptr[index]);
-            }
+            var tempResult = int.MinValue;
+             static int _max(int a, int b) =>a > b ? a : b;
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _max(tempResult, ptr[i]);
+             }
+             result = tempResult;
         }
-
-        public static uint Max(this NativeList<uint> source)
+         public static uint Max(this NativeList<uint> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MaxCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -195,22 +196,15 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MaxCore(uint* ptr, [AssumeRange(1, int.MaxValue)] int length, out uint result)
         {
-            var index = 0;
-            var result4 = new uint4(uint.MinValue, uint.MinValue, uint.MinValue, uint.MinValue);
-            var l = length / 4;
-            for (; index < l; index += 4)
-            {
-                result4 = math.max(result4, *(uint4*)(ptr + index));
-            }
-
-            result = math.cmax(result4);
-            for (; index < length; index++)
-            {
-                result = math.max(result, ptr[index]);
-            }
+            var tempResult = uint.MinValue;
+             static uint _max(uint a, uint b) =>a > b ? a : b;
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _max(tempResult, ptr[i]);
+             }
+             result = tempResult;
         }
-
-        public static long Max(this NativeList<long> source)
+         public static long Max(this NativeList<long> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MaxCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -234,14 +228,15 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MaxCore(long* ptr, [AssumeRange(1, int.MaxValue)] int length, out long result)
         {
-            result = long.MinValue;
-            for (int i = 0; i < length; i++)
-            {
-                if (result > ptr[i]) result = ptr[i];
-            }
+            var tempResult = long.MinValue;
+             static long _max(long a, long b) =>a > b ? a : b;
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _max(tempResult, ptr[i]);
+             }
+             result = tempResult;
         }
-
-        public static ulong Max(this NativeList<ulong> source)
+         public static ulong Max(this NativeList<ulong> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MaxCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -265,14 +260,15 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MaxCore(ulong* ptr, [AssumeRange(1, int.MaxValue)] int length, out ulong result)
         {
-            result = ulong.MinValue;
-            for (int i = 0; i < length; i++)
-            {
-                if (result > ptr[i]) result = ptr[i];
-            }
+            var tempResult = ulong.MinValue;
+             static ulong _max(ulong a, ulong b) =>a > b ? a : b;
+            
+             for (var i = 0; i < length; i++) {
+                tempResult = _max(tempResult, ptr[i]);
+             }
+             result = tempResult;
         }
-
-        public static float Max(this NativeList<float> source)
+         public static float Max(this NativeList<float> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MaxCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -296,22 +292,61 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MaxCore(float* ptr, [AssumeRange(1, int.MaxValue)] int length, out float result)
         {
-            var index = 0;
-            var result4 = new float4(float.MinValue, float.MinValue, float.MinValue, float.MinValue);
-            var l = length / 4;
-            for (; index < l; index += 4)
-            {
-                result4 = math.max(result4, *(float4*)(ptr + index));
-            }
-
-            result = math.cmax(result4);
-            for (; index < length; index++)
-            {
-                result = math.max(result, ptr[index]);
-            }
+            var tempResult = float.MinValue;
+            static float _max(float a, float b) =>IsNeonSupported?math.max(a,b): a > b ? a : b;
+            
+            var index= 0;
+            if(BurstHelpers.IsV256Supported){
+                static v256 _max256(v256 a, float* b) => new v256(
+                        _max(a.Float0, b[0]),
+                        _max(a.Float1, b[1]),
+                        _max(a.Float2, b[2]),
+                        _max(a.Float3, b[3]),
+                        _max(a.Float4, b[4]),
+                        _max(a.Float5, b[5]),
+                        _max(a.Float6, b[6]),
+                        _max(a.Float7, b[7])
+                );
+                
+                var packingLength = sizeof(v256) / sizeof(float);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v256(float.MinValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _max256(temp, (ptr+index));
+                    }
+                    float* tempAsArray = (float*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _max(tempResult, tempAsArray[i]);
+                    }
+                }    
+             }else if(BurstHelpers.IsV128Supported){
+                static v128 _max128(v128 a, float* b) => new v128(
+                    _max(a.Float0, b[0]),
+                    _max(a.Float1, b[1]),
+                    _max(a.Float2, b[2]),
+                    _max(a.Float3, b[3])
+                );
+                
+                var packingLength = sizeof(v128) / sizeof(float);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v128(float.MinValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _max128(temp, (ptr+index));
+                    }
+                    float* tempAsArray = (float*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _max(tempResult, tempAsArray[i]);
+                    }
+                }
+             }
+             for (; index < length; index++) {
+                 tempResult = _max(tempResult, ptr[index]);
+             }
+             result =  tempResult;
         }
-
-        public static double Max(this NativeList<double> source)
+         public static double Max(this NativeList<double> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MaxCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -335,20 +370,53 @@ namespace BurstLinq
         [BurstCompile]
         internal static void MaxCore(double* ptr, [AssumeRange(1, int.MaxValue)] int length, out double result)
         {
-            var index = 0;
-            var result4 = new double4(double.MinValue, double.MinValue, double.MinValue, double.MinValue);
-            var l = length / 4;
-            for (; index < l; index += 4)
-            {
-                result4 = math.max(result4, *(double4*)(ptr + index));
-            }
-
-            result = math.cmax(result4);
-            for (; index < length; index++)
-            {
-                result = math.max(result, ptr[index]);
-            }
+            var tempResult = double.MinValue;
+            static double _max(double a, double b) =>IsNeonSupported?math.max(a,b): a > b ? a : b;
+            
+            var index= 0;
+            if(BurstHelpers.IsV256Supported){
+                static v256 _max256(v256 a, double* b) => new v256(
+                        _max(a.Double0, b[0]),
+                        _max(a.Double1, b[1]),
+                        _max(a.Double2, b[2]),
+                        _max(a.Double3, b[3])
+                );
+                
+                var packingLength = sizeof(v256) / sizeof(double);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v256(double.MinValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _max256(temp, (ptr+index));
+                    }
+                    double* tempAsArray = (double*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _max(tempResult, tempAsArray[i]);
+                    }
+                }    
+             }else if(BurstHelpers.IsV128Supported){
+                static v128 _max128(v128 a, double* b) => new v128(
+                    _max(a.Double0, b[0]),
+                    _max(a.Double1, b[1])
+                );
+                
+                var packingLength = sizeof(v128) / sizeof(double);
+                 
+                if(0<length / packingLength) {
+                    var temp = new v128(double.MinValue);
+                    for (; index < length-packingLength; index+=packingLength) {
+                        temp = _max128(temp, (ptr+index));
+                    }
+                    double* tempAsArray = (double*) &temp;
+                    for (int i = 0; i < packingLength; i++) {
+                        tempResult = _max(tempResult, tempAsArray[i]);
+                    }
+                }
+             }
+             for (; index < length; index++) {
+                 tempResult = _max(tempResult, ptr[index]);
+             }
+             result =  tempResult;
         }
-
     }
 }

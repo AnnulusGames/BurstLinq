@@ -29,7 +29,7 @@ namespace BurstLinq
             AverageCore((int*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(int* ptr, [AssumeRange(1, int.MaxValue)] int length, out double result)
         {
@@ -57,7 +57,7 @@ namespace BurstLinq
             AverageCore((uint*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(uint* ptr, [AssumeRange(1, int.MaxValue)] int length, out double result)
         {
@@ -85,7 +85,7 @@ namespace BurstLinq
             AverageCore((long*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(long* ptr, [AssumeRange(1, int.MaxValue)] int length, out double result)
         {
@@ -113,7 +113,7 @@ namespace BurstLinq
             AverageCore((ulong*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(ulong* ptr, [AssumeRange(1, int.MaxValue)] int length, out double result)
         {
@@ -141,7 +141,7 @@ namespace BurstLinq
             AverageCore((float*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(float* ptr, [AssumeRange(1, int.MaxValue)] int length, out float result)
         {
@@ -169,7 +169,7 @@ namespace BurstLinq
             AverageCore((double*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(double* ptr, [AssumeRange(1, int.MaxValue)] int length, out double result)
         {
@@ -197,7 +197,7 @@ namespace BurstLinq
             AverageCore((Vector2*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(Vector2* ptr, [AssumeRange(1, int.MaxValue)] int length, out Vector2 result)
         {
@@ -225,7 +225,7 @@ namespace BurstLinq
             AverageCore((Vector2Int*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(Vector2Int* ptr, [AssumeRange(1, int.MaxValue)] int length, out Vector2 result)
         {
@@ -253,7 +253,7 @@ namespace BurstLinq
             AverageCore((Vector3*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(Vector3* ptr, [AssumeRange(1, int.MaxValue)] int length, out Vector3 result)
         {
@@ -281,7 +281,7 @@ namespace BurstLinq
             AverageCore((Vector3Int*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(Vector3Int* ptr, [AssumeRange(1, int.MaxValue)] int length, out Vector3 result)
         {
@@ -309,7 +309,7 @@ namespace BurstLinq
             AverageCore((Vector4*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(Vector4* ptr, [AssumeRange(1, int.MaxValue)] int length, out Vector4 result)
         {
@@ -337,7 +337,7 @@ namespace BurstLinq
             AverageCore((int2*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(int2* ptr, [AssumeRange(1, int.MaxValue)] int length, out double2 result)
         {
@@ -365,7 +365,7 @@ namespace BurstLinq
             AverageCore((int3*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(int3* ptr, [AssumeRange(1, int.MaxValue)] int length, out double3 result)
         {
@@ -393,7 +393,7 @@ namespace BurstLinq
             AverageCore((int4*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(int4* ptr, [AssumeRange(1, int.MaxValue)] int length, out double4 result)
         {
@@ -421,7 +421,7 @@ namespace BurstLinq
             AverageCore((float2*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(float2* ptr, [AssumeRange(1, int.MaxValue)] int length, out float2 result)
         {
@@ -449,7 +449,7 @@ namespace BurstLinq
             AverageCore((float3*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(float3* ptr, [AssumeRange(1, int.MaxValue)] int length, out float3 result)
         {
@@ -477,7 +477,7 @@ namespace BurstLinq
             AverageCore((float4*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(float4* ptr, [AssumeRange(1, int.MaxValue)] int length, out float4 result)
         {
@@ -505,7 +505,7 @@ namespace BurstLinq
             AverageCore((double2*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(double2* ptr, [AssumeRange(1, int.MaxValue)] int length, out double2 result)
         {
@@ -533,7 +533,7 @@ namespace BurstLinq
             AverageCore((double3*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(double3* ptr, [AssumeRange(1, int.MaxValue)] int length, out double3 result)
         {
@@ -561,7 +561,7 @@ namespace BurstLinq
             AverageCore((double4*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+        
         [BurstCompile]
         internal static void AverageCore(double4* ptr, [AssumeRange(1, int.MaxValue)] int length, out double4 result)
         {
