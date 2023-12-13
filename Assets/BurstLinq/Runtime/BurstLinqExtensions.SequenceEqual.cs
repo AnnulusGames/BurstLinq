@@ -566,7 +566,6 @@ namespace BurstLinq
 
             if (first == second) return true;
             if (first.Length != second.Length) return false;
-
             fixed (int* firstPtr = first, secondPtr = second)
             {
                 return SequenceEqualCore(firstPtr, secondPtr, first.Length);

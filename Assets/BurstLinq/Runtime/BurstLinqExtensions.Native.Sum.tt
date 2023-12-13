@@ -14,6 +14,21 @@
         "float2", "float3", "float4",
         "double2", "double3", "double4",
     };
+
+    bool TryGetTwiceVector(string type, out string longer) {
+        longer = null;
+        switch (type) {
+            case "int2": longer = "int4"; return true;
+            case "uint2": longer = "uint4"; return true;
+            case "float2": longer = "float4"; return true;
+            case "double2": longer = "double4"; return true;
+            case "Vector2": longer = "float4"; return true;
+            case "Vector2Int": longer = "int4"; return true;
+            default: return false;
+        
+        }
+    }
+    
 #>
 using Unity.Burst;
 using Unity.Burst.CompilerServices;
@@ -47,14 +62,24 @@ namespace BurstLinq
             SumCore((<#=type#>*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
-
+<#if (TryGetTwiceVector(type,out var twiceType)){#>
         [BurstCompile(FloatMode = FloatMode.Fast)]
         internal static void SumCore(<#=type#>* ptr, [AssumeRange(1, int.MaxValue)] int length, out <#=type#> result)
         {
-            result = default;
-            for (int i = 0; i < length; i++) result += ptr[i];
+            SumCore((<#=twiceType#>*)ptr, length  / 2, out var sum2);
+            <#=type#> sum = new <#=type#>(sum2.x+sum2.z, sum2.y+ sum2.w);
+            if (length%2==1) sum += ptr[length-1];
+            result = sum;
         }
-
+<# }else{#>
+        [BurstCompile(FloatMode = FloatMode.Fast)]
+        internal static void SumCore(<#=type#>* ptr, [AssumeRange(1, int.MaxValue)] int length, out <#=type#> result)
+        {
+            var sum = default(<#=type#>);
+            for (int i = 0; i < length; i++) sum += ptr[i];
+            result = sum;
+        }
+<# } #>
 <# } #>
     }
 }
