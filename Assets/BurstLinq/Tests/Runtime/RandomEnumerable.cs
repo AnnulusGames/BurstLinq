@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using Random = UnityEngine.Random;
 
 namespace BurstLinq.Tests
 {
     public static class RandomEnumerable
     {
-        public static IEnumerable<byte> Repeat(byte min, byte max, int count)
+        public static IEnumerable<byte> RepeatByte(byte min, byte max, int count)
         {
             var random = new Unity.Mathematics.Random((uint)Random.Range(0, int.MaxValue));
             for (int i = 0; i < count; i++)
@@ -15,7 +16,7 @@ namespace BurstLinq.Tests
             }
         }
 
-        public static IEnumerable<sbyte> Repeat(sbyte min, sbyte max, int count)
+        public static IEnumerable<sbyte> RepeatSByte(sbyte min, sbyte max, int count)
         {
             var random = new Unity.Mathematics.Random((uint)Random.Range(0, int.MaxValue));
             for (int i = 0; i < count; i++)
@@ -24,7 +25,7 @@ namespace BurstLinq.Tests
             }
         }
 
-        public static IEnumerable<short> Repeat(short min, short max, int count)
+        public static IEnumerable<short> RepeatShort(short min, short max, int count)
         {
             var random = new Unity.Mathematics.Random((uint)Random.Range(0, int.MaxValue));
             for (int i = 0; i < count; i++)
@@ -33,7 +34,7 @@ namespace BurstLinq.Tests
             }
         }
 
-        public static IEnumerable<ushort> Repeat(ushort min, ushort max, int count)
+        public static IEnumerable<ushort> RepeatUShort(ushort min, ushort max, int count)
         {
             var random = new Unity.Mathematics.Random((uint)Random.Range(0, int.MaxValue));
             for (int i = 0; i < count; i++)
@@ -42,7 +43,7 @@ namespace BurstLinq.Tests
             }
         }
 
-        public static IEnumerable<uint> Repeat(uint min, uint max, int count)
+        public static IEnumerable<uint> RepeatUInt(uint min, uint max, int count)
         {
             var random = new Unity.Mathematics.Random((uint)Random.Range(0, int.MaxValue));
             for (int i = 0; i < count; i++)
@@ -51,7 +52,7 @@ namespace BurstLinq.Tests
             }
         }
 
-        public static IEnumerable<long> Repeat(long min, long max, int count)
+        public static IEnumerable<long> RepeatLong(long min, long max, int count)
         {
             var random = new Unity.Mathematics.Random((uint)Random.Range(0, int.MaxValue));
             for (int i = 0; i < count; i++)
@@ -60,7 +61,7 @@ namespace BurstLinq.Tests
             }
         }
 
-        public static IEnumerable<ulong> Repeat(ulong min, ulong max, int count)
+        public static IEnumerable<ulong> RepeatULong(ulong min, ulong max, int count)
         {
             var random = new Unity.Mathematics.Random((uint)Random.Range(0, int.MaxValue));
             for (int i = 0; i < count; i++)
@@ -69,7 +70,7 @@ namespace BurstLinq.Tests
             }
         }
 
-        public static IEnumerable<int> Repeat(int min, int max, int count)
+        public static IEnumerable<int> RepeatInt(int min, int max, int count)
         {
             var random = new Unity.Mathematics.Random((uint)Random.Range(0, int.MaxValue));
             for (int i = 0; i < count; i++)
@@ -78,7 +79,7 @@ namespace BurstLinq.Tests
             }
         }
 
-        public static IEnumerable<float> Repeat(float min, float max, int count)
+        public static IEnumerable<float> RepeatFloat(float min, float max, int count)
         {
             var random = new Unity.Mathematics.Random((uint)Random.Range(0, int.MaxValue));
             for (int i = 0; i < count; i++)
@@ -87,7 +88,34 @@ namespace BurstLinq.Tests
             }
         }
 
-        public static IEnumerable<double> Repeat(double min, double max, int count)
+        public static IEnumerable<float2> RepeatFloat2(float2 min, float2 max, int count)
+        {
+            var random = new Unity.Mathematics.Random((uint)Random.Range(0, int.MaxValue));
+            for (int i = 0; i < count; i++)
+            {
+                yield return random.NextFloat2(min, max);
+            }
+        }
+
+        public static IEnumerable<float3> RepeatFloat3(float3 min, float3 max, int count)
+        {
+            var random = new Unity.Mathematics.Random((uint)Random.Range(0, int.MaxValue));
+            for (int i = 0; i < count; i++)
+            {
+                yield return random.NextFloat3(min, max);
+            }
+        }
+
+        public static IEnumerable<float4> RepeatFloat4(float4 min, float4 max, int count)
+        {
+            var random = new Unity.Mathematics.Random((uint)Random.Range(0, int.MaxValue));
+            for (int i = 0; i < count; i++)
+            {
+                yield return random.NextFloat4(min, max);
+            }
+        }
+
+        public static IEnumerable<double> RepeatDouble(double min, double max, int count)
         {
             var random = new Unity.Mathematics.Random((uint)Random.Range(0, int.MaxValue));
             for (int i = 0; i < count; i++)
@@ -96,19 +124,30 @@ namespace BurstLinq.Tests
             }
         }
 
-        public static void Fill(this Span<int> span, int min, int max)
+        public static IEnumerable<double2> RepeatDouble2(double2 min, double2 max, int count)
         {
-            for (int i = 0; i < span.Length; i++)
+            var random = new Unity.Mathematics.Random((uint)Random.Range(0, int.MaxValue));
+            for (int i = 0; i < count; i++)
             {
-                span[i] = Random.Range(min, max);
+                yield return random.NextDouble2(min, max);
             }
         }
-        
-        public static void Fill(this Span<float> span, float min, float max)
+
+        public static IEnumerable<double3> RepeatDouble3(double3 min, double3 max, int count)
         {
-            for (int i = 0; i < span.Length; i++)
+            var random = new Unity.Mathematics.Random((uint)Random.Range(0, int.MaxValue));
+            for (int i = 0; i < count; i++)
             {
-                span[i] = Random.Range(min, max);
+                yield return random.NextDouble3(min, max);
+            }
+        }
+
+        public static IEnumerable<double4> RepeatDouble4(double4 min, double4 max, int count)
+        {
+            var random = new Unity.Mathematics.Random((uint)Random.Range(0, int.MaxValue));
+            for (int i = 0; i < count; i++)
+            {
+                yield return random.NextDouble4(min, max);
             }
         }
     }

@@ -21,7 +21,7 @@ namespace BurstLinq.Tests
         {
             for (int i = 0; i < IterationCount; i++)
             {
-                var list = RandomEnumerable.Repeat(0, 100, 1000).ToList();
+                var list = RandomEnumerable.RepeatInt(0, 100, 1000).ToList();
 
                 var result1 = Enumerable.Min(list);
                 var result2 = BurstLinqExtensions.Min(list);
@@ -35,7 +35,7 @@ namespace BurstLinq.Tests
         {
             for (int i = 0; i < IterationCount; i++)
             {
-                var array = RandomEnumerable.Repeat((byte)0, (byte)100, 100).ToArray();
+                var array = RandomEnumerable.RepeatByte((byte)0, (byte)100, 100).ToArray();
 
                 var result1 = Enumerable.Min(array);
                 var result2 = BurstLinqExtensions.Min(array);
@@ -49,7 +49,7 @@ namespace BurstLinq.Tests
         {
             for (int i = 0; i < IterationCount; i++)
             {
-                var array = RandomEnumerable.Repeat((sbyte)0, (sbyte)100, 100).ToArray();
+                var array = RandomEnumerable.RepeatSByte((sbyte)0, (sbyte)100, 100).ToArray();
 
                 var result1 = Enumerable.Min(array);
                 var result2 = BurstLinqExtensions.Min(array);
@@ -63,7 +63,7 @@ namespace BurstLinq.Tests
         {
             for (int i = 0; i < IterationCount; i++)
             {
-                var array = RandomEnumerable.Repeat((short)-100, (short)100, 100).ToArray();
+                var array = RandomEnumerable.RepeatShort((short)-100, (short)100, 100).ToArray();
 
                 var result1 = Enumerable.Min(array);
                 var result2 = BurstLinqExtensions.Min(array);
@@ -77,7 +77,7 @@ namespace BurstLinq.Tests
         {
             for (int i = 0; i < IterationCount; i++)
             {
-                var array = RandomEnumerable.Repeat((ushort)0, (ushort)100, 100).ToArray();
+                var array = RandomEnumerable.RepeatUShort((ushort)0, (ushort)100, 100).ToArray();
 
                 var result1 = Enumerable.Min(array);
                 var result2 = BurstLinqExtensions.Min(array);
@@ -91,7 +91,7 @@ namespace BurstLinq.Tests
         {
             for (int i = 0; i < IterationCount; i++)
             {
-                var array = RandomEnumerable.Repeat(-100, 100, 100).ToArray();
+                var array = RandomEnumerable.RepeatInt(-100, 100, 100).ToArray();
 
                 var result1 = Enumerable.Min(array);
                 var result2 = BurstLinqExtensions.Min(array);
@@ -105,7 +105,7 @@ namespace BurstLinq.Tests
         {
             for (int i = 0; i < IterationCount; i++)
             {
-                var array = RandomEnumerable.Repeat(0, 100, 100).ToArray();
+                var array = RandomEnumerable.RepeatInt(0, 100, 100).ToArray();
 
                 var result1 = Enumerable.Min(array);
                 var result2 = BurstLinqExtensions.Min(array);
@@ -119,7 +119,7 @@ namespace BurstLinq.Tests
         {
             for (int i = 0; i < IterationCount; i++)
             {
-                var array = RandomEnumerable.Repeat(-100L, 100L, 100).ToArray();
+                var array = RandomEnumerable.RepeatLong(-100L, 100L, 100).ToArray();
 
                 var result1 = Enumerable.Min(array);
                 var result2 = BurstLinqExtensions.Min(array);
@@ -133,7 +133,7 @@ namespace BurstLinq.Tests
         {
             for (int i = 0; i < IterationCount; i++)
             {
-                var array = RandomEnumerable.Repeat(0L, 100L, 100).ToArray();
+                var array = RandomEnumerable.RepeatLong(0L, 100L, 100).ToArray();
 
                 var result1 = Enumerable.Min(array);
                 var result2 = BurstLinqExtensions.Min(array);
@@ -147,7 +147,7 @@ namespace BurstLinq.Tests
         {
             for (int i = 0; i < IterationCount; i++)
             {
-                var array = RandomEnumerable.Repeat(0f, 100f, 1000).ToArray();
+                var array = RandomEnumerable.RepeatFloat(0f, 100f, 1000).ToArray();
 
                 var result1 = Enumerable.Min(array);
                 var result2 = BurstLinqExtensions.Min(array);
@@ -161,7 +161,7 @@ namespace BurstLinq.Tests
         {
             for (int i = 0; i < IterationCount; i++)
             {
-                var array = RandomEnumerable.Repeat(0.0, 100.0, 1000).ToArray();
+                var array = RandomEnumerable.RepeatDouble(0.0, 100.0, 1000).ToArray();
 
                 var result1 = Enumerable.Min(array);
                 var result2 = BurstLinqExtensions.Min(array);
