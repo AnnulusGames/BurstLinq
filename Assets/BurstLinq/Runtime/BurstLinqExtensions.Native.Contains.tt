@@ -14,12 +14,14 @@
         "float2", "float3", "float4",
         "double2", "double3", "double4",
     };
+
     bool IsPrimitive(string type)
     {
         return type is  "byte"or  "sbyte"or  "short"or  "ushort"or "int" or "uint" or "float" or "double" or "long" or "ulong";
     }
     
-    string V256Name(string type) {
+    string V256Name(string type)
+    {
         switch (@type) {
             case "sbyte": return "SByte";
             case "byte": return "Byte";
@@ -34,8 +36,11 @@
         }
         throw new Exception("Invalid type");
     }
-    int Size(string type) {
-        switch (@type) {
+
+    int Size(string type)
+    {
+        switch (@type) 
+        {
             case "sbyte": return 1;
             case "byte": return 1;
             case "short": return 2;
@@ -64,16 +69,19 @@
             case "double3": return sizeof(double) * 3;
             case "double4": return sizeof(double) * 4;
         }
+
         throw new Exception("Invalid type");
     }
-    bool TryGetInteger(string type, out string type2) {
+
+    bool TryGetInteger(string type, out string type2)
+    {
         type2 = null;
-        switch (type) {
+        switch (type)
+        {
             case "int2": type2 = "long"; return true;
             case "uint2": type2 = "long"; return true;
             case "Vector2Int": type2 = "long"; return true;
             default: return false;
-        
         }
     }
 #>
@@ -95,7 +103,7 @@ namespace BurstLinq
             return ContainsCore(source.GetUnsafePtr(), source.Length, value);
         }
 
-        public  static bool Contains(this NativeSlice<<#=type#>> source, <#=type#> value)
+        public static bool Contains(this NativeSlice<<#=type#>> source, <#=type#> value)
         {
             return ContainsCore((<#=type#>*)source.GetUnsafePtr(), source.Length, value);
         }
@@ -104,58 +112,72 @@ namespace BurstLinq
         {
             return ContainsCore((<#=type#>*)source.GetUnsafePtr(), source.Length, value);
         }
-<#if (TryGetInteger(type,out var intType)){#>
+
+<#if (TryGetInteger(type, out var intType)){#>
         internal static bool ContainsCore(<#=type#>* ptr, [AssumeRange(1, int.MaxValue)] int length, in <#=type#> value)
         {
-            var temp=value;
-            var union=*(<#=intType#>*)&temp;
-           return ContainsCore((<#=intType#>*)ptr,length,union);
+            var temp = value;
+            var union = *(<#=intType#>*)&temp;
+            return ContainsCore((<#=intType#>*)ptr, length, union);
         }
 <#} else if (IsPrimitive(type)) { #>
 <#var vName = V256Name(type);#>
         [BurstCompile]
         internal static bool ContainsCore(<#=type#>* ptr, [AssumeRange(1, int.MaxValue)] int length, in <#=type#> value)
         {
-             var index= 0;
-            if(BurstHelpers.IsV256Supported){
+            var index = 0;
+            if (BurstHelpers.IsV256Supported)
+            {
                 const int packingLength = 32 / sizeof(<#=type#>);
 
- <# int vectorLength=32/Size(type);string typeName = V256Name(type);#>
-                 static bool<#=vectorLength#> _contains(v256 a, <#=type#>* b) => new bool<#=vectorLength#>(
- <# for (int i =0;i<vectorLength-1;i++) {#>
-                    a.<#=typeName+i#>== b[<#=i#>],
+<# int vectorLength=32/Size(type);string typeName = V256Name(type);#>
+                static bool<#=vectorLength#> _contains(v256 a, <#=type#>* b) => new bool<#=vectorLength#>(
+<# for (int i =0;i<vectorLength-1;i++) {#>
+                    a.<#=typeName+i#> == b[<#=i#>],
 <# } #>
-                    a.<#=typeName+(vectorLength-1)#>== b[<#=vectorLength-1#>]);
+                    a.<#=typeName+(vectorLength-1)#> == b[<#=vectorLength-1#>]
+                );
                 
-                if(0<length / packingLength) {
+                if (0 < length / packingLength) 
+                {
                     var valueVector = new v256(value);
-                    for (; index < length-packingLength; index += packingLength) {
+                    for (; index < length-packingLength; index += packingLength)
+                    {
                         if(_contains(valueVector, ptr + index).any()) return true;
                     }
                 }
-            }else if(BurstHelpers.IsV128Supported){
+            }
+            else if (BurstHelpers.IsV128Supported)
+            {
                 const int packingLength = 16 / sizeof(<#=type#>);
               
-                static bool<#=vectorLength/2#> _contains(v128 a, <#=type#>* b)  =>new bool<#=vectorLength/2#>(
- <# for (int i =0;i<vectorLength/2-1;i++) {#>
-                    a.<#=typeName+i#>== b[<#=i#>],
+                static bool<#=vectorLength/2#> _contains(v128 a, <#=type#>* b) => new bool<#=vectorLength/2#>(
+<# for (int i = 0; i < vectorLength / 2 - 1; i++) {#>
+                    a.<#=typeName + i#> == b[<#=i#>],
 <# } #>
-                    a.<#=typeName+(vectorLength/2-1)#>== b[<#=vectorLength/2-1#>]);
-                if(0<length / packingLength) {
+                    a.<#=typeName + (vectorLength / 2 - 1)#> == b[<#=vectorLength / 2 - 1#>]
+                );
+
+                if (0 < length / packingLength)
+                {
                     var valueVector = new v128(value);
-                    for (; index < length-packingLength; index += packingLength) {
+                    for (; index < length - packingLength; index += packingLength)
+                    {
                         if(_contains(valueVector, ptr + index).any()) return true;
                     }
                 }
             }
-            for (; index < length; index++) {
-                if (ptr[index]==value) return true;
+
+            for (; index < length; index++)
+            {
+                if (ptr[index] == value) return true;
             }
+
             return false;
         }
 <#} else { #>
         [BurstCompile]
-        internal  static bool ContainsCore(<#=type#>* ptr, [AssumeRange(0, int.MaxValue)] int length, in <#=type#> value)
+        internal static bool ContainsCore(<#=type#>* ptr, [AssumeRange(0, int.MaxValue)] int length, in <#=type#> value)
         {
             for (int i = 0; i < length; i++)
             {
@@ -166,5 +188,6 @@ namespace BurstLinq
         }
 <# } #>
 <# } #>
+
     }
 }

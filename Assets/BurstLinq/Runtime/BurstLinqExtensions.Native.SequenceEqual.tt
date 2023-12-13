@@ -15,10 +15,12 @@
         "double2", "double3", "double4",
     };
 
-    bool IsFloats(string type) {
+    bool IsFloats(string type)
+    {
         return type is "float"  or "float2" or "float3" or "float4"  or "Vector2" or "Vector3" or "Vector4";
     }
-    bool IsDoubles(string type) {
+    bool IsDoubles(string type)
+    {
         return type is  "double" or  "double2" or "double3" or "double4" ;
     }
 #>
@@ -31,19 +33,19 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using UnityEngine;
+
 namespace BurstLinq
 {
     public unsafe static partial class BurstLinqExtensions
     {
 <# foreach(var type in types) { #>
-
         public static bool SequenceEqual(this NativeList<<#=type#>> first, NativeList<<#=type#>> second)
         {
             if (first.Length != second.Length) return false;
             return SequenceEqualCore(first.GetUnsafePtr(), second.GetUnsafePtr(), first.Length);
         }
 
-        public  static bool SequenceEqual(this NativeSlice<<#=type#>> first, NativeSlice<<#=type#>> second)
+        public static bool SequenceEqual(this NativeSlice<<#=type#>> first, NativeSlice<<#=type#>> second)
         {
             if (first.Length != second.Length) return false;
             return SequenceEqualCore((<#=type#>*)first.GetUnsafePtr(), (<#=type#>*)second.GetUnsafePtr(), first.Length);
@@ -54,17 +56,19 @@ namespace BurstLinq
             if (first.Length != second.Length) return false;
             return SequenceEqualCore((<#=type#>*)first.GetUnsafePtr(), (<#=type#>*)second.GetUnsafePtr(), first.Length);
         }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static bool SequenceEqualCore(<#=type#>* firstPtr, <#=type#>* secondPtr, [AssumeRange(0, int.MaxValue)] int length)
         {
 <# if (IsFloats(type)){#>
-            return CmpHelpers.FloatCmp((float*)firstPtr, (float*)secondPtr, length*(sizeof(<#=type#>)/sizeof(float)));
+            return CmpHelpers.FloatCmp((float*)firstPtr, (float*)secondPtr, length*(sizeof(<#=type#>) / sizeof(float)));
 <# } else if(IsDoubles(type)){#>
-            return CmpHelpers.DoubleCmp((double*)firstPtr, (double*)secondPtr, length*(sizeof(<#=type#>)/sizeof(double)));
+            return CmpHelpers.DoubleCmp((double*)firstPtr, (double*)secondPtr, length*(sizeof(<#=type#>) / sizeof(double)));
 <# } else{#>
-            return CmpHelpers.MemCmp(firstPtr, secondPtr, length*(sizeof(<#=type#>)));  
+            return CmpHelpers.MemCmp(firstPtr, secondPtr, length * (sizeof(<#=type#>)));  
 <# } #>
-        }    
+        }
+
 <# } #>
     }
 }

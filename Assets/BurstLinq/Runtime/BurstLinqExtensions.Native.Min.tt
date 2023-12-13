@@ -9,8 +9,11 @@
     {
         "byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", "float", "double"
     };
-    string V256Name(string type) {
-        switch (@type) {
+
+    string V256Name(string type)
+    {
+        switch (@type)
+        {
             case "sbyte": return "SByte";
             case "byte": return "Byte";
             case "short": return "SShort";
@@ -24,8 +27,11 @@
         }
         throw new Exception("Invalid type");
     }
-    int Size(string type) {
-        switch (@type) {
+
+    int Size(string type)
+    {
+        switch (@type)
+        {
             case "sbyte": return 1;
             case "byte": return 1;
             case "short": return 2;
@@ -39,25 +45,26 @@
         }
         throw new Exception("Invalid type");
     }
-    bool IsFloating(string type) {
+    
+    bool IsFloating(string type)
+    {
         return type is "float" or "double";
     }
 #>
 using Unity.Burst;
 using Unity.Burst.CompilerServices;
 using Unity.Burst.Intrinsics;
-using static Unity.Burst.Intrinsics.Arm.Neon;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
-using System.Runtime.CompilerServices;
+using static Unity.Burst.Intrinsics.Arm.Neon;
+
 namespace BurstLinq
-{  
-   
+{
     public unsafe static partial class BurstLinqExtensions
     {
 <# foreach(var type in types) { #>
-         public static <#=type#> Min(this NativeList<<#=type#>> source)
+        public static <#=type#> Min(this NativeList<<#=type#>> source)
         {
             Error.ThrowIfEmpty(source.Length);
             MinCore(source.GetUnsafePtr(), source.Length, out var result);
@@ -77,35 +84,42 @@ namespace BurstLinq
             MinCore((<#=type#>*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
+
         [BurstCompile]
         internal static void MinCore(<#=type#>* ptr, [AssumeRange(1, int.MaxValue)] int length, out <#=type#> result)
         {
             var tempResult = <#=type#>.MaxValue;
 <# if (IsFloating(type)) {#>
-            static <#=type#> _min(<#=type#> a, <#=type#> b) =>IsNeonSupported?math.min(a,b): a < b ? a : b;
-            var index= 0;
-            if(BurstHelpers.IsV256Supported){
+            static <#=type#> _min(<#=type#> a, <#=type#> b) => IsNeonSupported ? math.min(a,b): a < b ? a : b;
+            var index = 0;
+            if (BurstHelpers.IsV256Supported)
+            {
                 static v256 _min256(v256 a, <#=type#>* b) => new v256(
-    <# int vectorLength=32/Size(type);string typeName = V256Name(type);
-    for (int i =0;i<vectorLength-1;i++) {#>
+<# int vectorLength = 32 / Size(type); string typeName = V256Name(type);
+for (int i = 0; i < vectorLength - 1; i++) {#>
                     _min(a.<#=typeName+i#>, b[<#=i#>]),
-    <# } #>
+<# } #>
                     _min(a.<#=typeName+(vectorLength-1)#>, b[<#=(vectorLength-1)#>])
                 );
                 
                 var packingLength = sizeof(v256) / sizeof(<#=type#>);
                  
-                if(0<length / packingLength) {
+                if (0 < length / packingLength)
+                {
                     var temp = new v256(<#=type#>.MaxValue);
-                    for (; index < length-packingLength; index+=packingLength) {
+                    for (; index < length - packingLength; index += packingLength)
+                    {
                         temp = _min256(temp, ptr+index);
                     }
-                    <#=type#>* tempAsArray = (<#=type#>*) &temp;
-                    for (int i = 0; i < packingLength; i++) {
+                    <#=type#>* tempAsArray = (<#=type#>*)&temp;
+                    for (int i = 0; i < packingLength; i++)
+                    {
                         tempResult = _min(tempResult, tempAsArray[i]);
                     }
                 }    
-             }else if(BurstHelpers.IsV128Supported){
+            }
+            else if (BurstHelpers.IsV128Supported)
+            {
                 static v128 _min128(v128 a, <#=type#>* b) => new v128(
 <# for (int i =0;i<vectorLength/2-1;i++) {#>
                     _min(a.<#=typeName+i#>, b[<#=i#>]),
@@ -115,30 +129,39 @@ namespace BurstLinq
                 
                 var packingLength = sizeof(v128) / sizeof(<#=type#>);
                  
-                if(0<length / packingLength) {
+                if (0 < length / packingLength)
+                {
                     var temp = new v128(<#=type#>.MaxValue);
-                    for (; index < length-packingLength; index+=packingLength) {
+                    for (; index < length - packingLength; index += packingLength)
+                    {
                         temp = _min128(temp, ptr+index);
                     }
                     <#=type#>* tempAsArray = (<#=type#>*) &temp;
-                    for (int i = 0; i < packingLength; i++) {
+                    for (int i = 0; i < packingLength; i++)
+                    {
                         tempResult = _min(tempResult, tempAsArray[i]);
                     }
                 }
-             }
-             for (; index < length; index++) {
-                 tempResult = _min(tempResult, ptr[index]);
-             }
-             result =  tempResult;
+            }
+
+            for (; index < length; index++)
+            {
+                tempResult = _min(tempResult, ptr[index]);
+            }
+
+            result =  tempResult;
 <# } else {#>
-             static <#=type#> _min(<#=type#> a, <#=type#> b) =>a < b ? a : b;
-            
-             for (var i = 0; i < length; i++) {
+            static <#=type#> _min(<#=type#> a, <#=type#> b) => a < b ? a : b;
+        
+            for (var i = 0; i < length; i++)
+            {
                 tempResult = _min(tempResult, ptr[i]);
-             }
-             result = tempResult;
+            }
+
+            result = tempResult;
 <# } #>
         }
+
 <# } #>
         
     }
