@@ -2,7 +2,7 @@
 
 namespace BurstLinq
 {
-    public static unsafe class BurstHelpers
+    internal static unsafe class BurstHelpers
     {
         internal static bool IsFloatingPoint256Supported => X86.Avx.IsAvxSupported;
         internal static bool IsInteger256Supported => X86.Avx2.IsAvx2Supported;

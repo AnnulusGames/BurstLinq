@@ -7,7 +7,7 @@ using Unity.Mathematics;
 namespace BurstLinq
 {
     [BurstCompile]
-    public static unsafe class CmpHelpers
+    internal static unsafe class CmpHelpers
     {
         [BurstCompile]
         public static bool MemCmp(void* ptr1, void* ptr2, long size)
@@ -50,7 +50,6 @@ namespace BurstLinq
                 for (; index < length - packingLength; index += packingLength)
                 {
                     if (math.any(*(float4*)(ptr1 + index) != *(float4*)(ptr2 + index))) return false;
-
                 }
             }
 

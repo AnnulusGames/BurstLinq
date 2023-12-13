@@ -5,7 +5,7 @@ using Unity.Mathematics;
 
 namespace BurstLinq
 {
-    public static class VectorExtensions
+    internal static class VectorExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool any(this bool2 v) => v.x || v.y;
@@ -23,9 +23,8 @@ namespace BurstLinq
 
     [Serializable]
     [StructLayout(LayoutKind.Explicit, Size = 32 * sizeof(bool))]
-    public struct bool32
+    internal struct bool32
     {
-
         [FieldOffset(0)]
         public bool x0;
 
@@ -164,7 +163,7 @@ namespace BurstLinq
 
     [Serializable]
     [StructLayout(LayoutKind.Explicit, Size = 16 * sizeof(bool))]
-    public struct bool16
+    internal struct bool16
     {
         [FieldOffset(0)]
         public bool x0;
@@ -244,10 +243,10 @@ namespace BurstLinq
         public bool any() => x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7 || x8 || x9 || x10 || x11 || x12 || x13 || x14 || x15;
         public bool all() => x0 && x1 && x2 && x3 && x4 && x5 && x6 && x7 || x8 && x9 && x10 && x11 && x12 && x13 && x14 && x15;
     }
-    
+
     [Serializable]
     [StructLayout(LayoutKind.Explicit, Size = 8 * sizeof(bool))]
-    public struct bool8
+    internal struct bool8
     {
         [FieldOffset(0)]
         public bool x0;
