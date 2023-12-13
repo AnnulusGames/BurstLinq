@@ -1,0 +1,96 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#
+    string GetTypeName(string typeName)
+    {
+        if (typeName[0] == 'u') return "U" + char.ToUpper(typeName[1]) + typeName.Substring(2);
+        if (typeName == "sbyte") return "SByte";
+        return char.ToUpper(typeName[0]) + typeName.Substring(1);
+    }
+
+    bool IsLinqSupport(string typeName)
+    {
+        return typeName is "int" or "long" or "float" or "double";
+    }
+
+    bool IsFloat(string typeName)
+    {
+        return typeName is "float" or "float2" or "float3" or "float4"
+            or "double" or "double2" or "double3" or "double4"
+            or "Vector2" or "Vector3" or "Vector4";
+    }
+
+    var types = new string[]
+    {
+        "int", "uint", "long", "ulong", "float", "double",
+        "Vector2", "Vector2Int", "Vector3", "Vector3Int", "Vector4",
+        "int2", "int3", "int4",
+        "uint2", "uint3", "uint4",
+        "float2", "float3", "float4",
+        "double2", "double3", "double4",
+    };
+#>
+using System;
+using System.Linq;
+using NUnit.Framework;
+using Unity.Mathematics;
+using UnityEngine;
+using Assert = UnityEngine.Assertions.Assert;
+using Random = UnityEngine.Random;
+
+namespace BurstLinq.Tests
+{
+    public class SumTest
+    {
+        [SetUp]
+        public void SetUp()
+        {
+            Random.InitState((int)DateTime.Now.Ticks);
+        }
+
+        [Test]
+        public void Test_List()
+        {
+            for (int i = 0; i < 1000; i++)
+            {
+                var list = RandomEnumerable.RepeatInt(0, 100, 1000).ToList();
+
+                var result1 = Enumerable.Sum(list);
+                var result2 = BurstLinqExtensions.Sum(list);
+
+                Assert.AreEqual(result1, result2);
+            }
+        }
+
+<# foreach(var type in types) { #>
+        [Test]
+        public void Test_Array_<#=GetTypeName(type)#>()
+        {
+            for (int i = 0; i < 1000; i++)
+            {
+                var array = RandomEnumerable.Repeat<#=GetTypeName(type)#>(0, 100, 1000).ToArray();
+
+<# if (IsLinqSupport(type)) { #>
+                var result1 = Enumerable.Sum(array);
+                var result2 = BurstLinqExtensions.Sum(array);
+<# } else { #>
+                <#=type#> result1 = default;
+                for (int n = 0; n < array.Length; n++) result1 += array[n];
+                var result2 = BurstLinqExtensions.Sum(array);
+<# } #>
+
+<# if (IsFloat(type)) { #>
+                AssertEx.AreApproximatelyEqual(result1, result2);
+<# } else { #>
+                Assert.AreEqual(result1, result2);
+<# } #>
+            }
+        }
+
+<# } #>
+    }
+}
