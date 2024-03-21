@@ -100,7 +100,7 @@ namespace BurstLinq
 <# foreach(var type in types) { #>
         public static bool Contains(this NativeList<<#=type#>> source, <#=type#> value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((<#=type#>*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<<#=type#>> source, <#=type#> value)

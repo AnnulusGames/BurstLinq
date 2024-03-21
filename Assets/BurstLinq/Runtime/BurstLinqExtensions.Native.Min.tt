@@ -67,7 +67,7 @@ namespace BurstLinq
         public static <#=type#> Min(this NativeList<<#=type#>> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MinCore(source.GetUnsafePtr(), source.Length, out var result);
+            MinCore((<#=type#>*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 

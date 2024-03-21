@@ -12,7 +12,7 @@ namespace BurstLinq
     {
         public static bool Contains(this NativeList<byte> source, byte value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((byte*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<byte> source, byte value)
@@ -119,7 +119,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<sbyte> source, sbyte value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((sbyte*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<sbyte> source, sbyte value)
@@ -226,7 +226,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<short> source, short value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((short*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<short> source, short value)
@@ -309,7 +309,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<ushort> source, ushort value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((ushort*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<ushort> source, ushort value)
@@ -392,7 +392,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<int> source, int value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((int*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<int> source, int value)
@@ -463,7 +463,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<uint> source, uint value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((uint*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<uint> source, uint value)
@@ -534,7 +534,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<long> source, long value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((long*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<long> source, long value)
@@ -599,7 +599,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<ulong> source, ulong value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((ulong*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<ulong> source, ulong value)
@@ -664,7 +664,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<float> source, float value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((float*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<float> source, float value)
@@ -735,7 +735,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<double> source, double value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((double*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<double> source, double value)
@@ -800,7 +800,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<Vector2> source, Vector2 value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((Vector2*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<Vector2> source, Vector2 value)
@@ -825,7 +825,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<Vector2Int> source, Vector2Int value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((Vector2Int*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<Vector2Int> source, Vector2Int value)
@@ -846,7 +846,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<Vector3> source, Vector3 value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((Vector3*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<Vector3> source, Vector3 value)
@@ -871,7 +871,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<Vector3Int> source, Vector3Int value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((Vector3Int*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<Vector3Int> source, Vector3Int value)
@@ -896,7 +896,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<Vector4> source, Vector4 value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((Vector4*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<Vector4> source, Vector4 value)
@@ -921,7 +921,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<int2> source, int2 value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((int2*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<int2> source, int2 value)
@@ -942,7 +942,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<int3> source, int3 value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((int3*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<int3> source, int3 value)
@@ -967,7 +967,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<int4> source, int4 value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((int4*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<int4> source, int4 value)
@@ -992,7 +992,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<uint2> source, uint2 value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((uint2*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<uint2> source, uint2 value)
@@ -1013,7 +1013,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<uint3> source, uint3 value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((uint3*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<uint3> source, uint3 value)
@@ -1038,7 +1038,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<uint4> source, uint4 value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((uint4*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<uint4> source, uint4 value)
@@ -1063,7 +1063,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<float2> source, float2 value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((float2*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<float2> source, float2 value)
@@ -1088,7 +1088,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<float3> source, float3 value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((float3*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<float3> source, float3 value)
@@ -1113,7 +1113,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<float4> source, float4 value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((float4*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<float4> source, float4 value)
@@ -1138,7 +1138,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<double2> source, double2 value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((double2*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<double2> source, double2 value)
@@ -1163,7 +1163,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<double3> source, double3 value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((double3*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<double3> source, double3 value)
@@ -1188,7 +1188,7 @@ namespace BurstLinq
         }
         public static bool Contains(this NativeList<double4> source, double4 value)
         {
-            return ContainsCore(source.GetUnsafePtr(), source.Length, value);
+            return ContainsCore((double4*)source.GetUnsafePtr(), source.Length, value);
         }
 
         public static bool Contains(this NativeSlice<double4> source, double4 value)

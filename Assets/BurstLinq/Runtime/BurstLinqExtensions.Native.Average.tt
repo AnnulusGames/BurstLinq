@@ -53,7 +53,7 @@ namespace BurstLinq
         public static <#=retType(type)#> Average(this NativeList<<#=type#>> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((<#=type#>*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
