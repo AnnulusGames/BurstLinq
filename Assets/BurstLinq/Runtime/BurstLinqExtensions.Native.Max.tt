@@ -67,7 +67,7 @@ namespace BurstLinq
         public static <#=type#> Max(this NativeList<<#=type#>> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MaxCore(source.GetUnsafePtr(), source.Length, out var result);
+            MaxCore((<#=type#>*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 

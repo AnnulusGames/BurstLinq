@@ -12,7 +12,7 @@ namespace BurstLinq
         public static double Average(this NativeList<int> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((int*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -40,7 +40,7 @@ namespace BurstLinq
         public static double Average(this NativeList<uint> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((uint*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -68,7 +68,7 @@ namespace BurstLinq
         public static double Average(this NativeList<long> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((long*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -96,7 +96,7 @@ namespace BurstLinq
         public static double Average(this NativeList<ulong> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((ulong*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -124,7 +124,7 @@ namespace BurstLinq
         public static float Average(this NativeList<float> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((float*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -152,7 +152,7 @@ namespace BurstLinq
         public static double Average(this NativeList<double> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((double*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -180,7 +180,7 @@ namespace BurstLinq
         public static Vector2 Average(this NativeList<Vector2> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((Vector2*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -208,7 +208,7 @@ namespace BurstLinq
         public static Vector2 Average(this NativeList<Vector2Int> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((Vector2Int*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -236,7 +236,7 @@ namespace BurstLinq
         public static Vector3 Average(this NativeList<Vector3> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((Vector3*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -264,7 +264,7 @@ namespace BurstLinq
         public static Vector3 Average(this NativeList<Vector3Int> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((Vector3Int*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -292,7 +292,7 @@ namespace BurstLinq
         public static Vector4 Average(this NativeList<Vector4> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((Vector4*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -320,7 +320,7 @@ namespace BurstLinq
         public static double2 Average(this NativeList<int2> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((int2*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -348,7 +348,7 @@ namespace BurstLinq
         public static double3 Average(this NativeList<int3> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((int3*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -376,7 +376,7 @@ namespace BurstLinq
         public static double4 Average(this NativeList<int4> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((int4*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -404,7 +404,7 @@ namespace BurstLinq
         public static float2 Average(this NativeList<float2> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((float2*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -432,7 +432,7 @@ namespace BurstLinq
         public static float3 Average(this NativeList<float3> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((float3*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -460,7 +460,7 @@ namespace BurstLinq
         public static float4 Average(this NativeList<float4> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((float4*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -488,7 +488,7 @@ namespace BurstLinq
         public static double2 Average(this NativeList<double2> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((double2*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -516,7 +516,7 @@ namespace BurstLinq
         public static double3 Average(this NativeList<double3> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((double3*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -544,7 +544,7 @@ namespace BurstLinq
         public static double4 Average(this NativeList<double4> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            AverageCore(source.GetUnsafePtr(), source.Length, out var result);
+            AverageCore((double4*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 

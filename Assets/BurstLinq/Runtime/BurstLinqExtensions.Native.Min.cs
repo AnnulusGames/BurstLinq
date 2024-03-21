@@ -13,7 +13,7 @@ namespace BurstLinq
         public static byte Min(this NativeList<byte> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MinCore(source.GetUnsafePtr(), source.Length, out var result);
+            MinCore((byte*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -48,7 +48,7 @@ namespace BurstLinq
         public static sbyte Min(this NativeList<sbyte> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MinCore(source.GetUnsafePtr(), source.Length, out var result);
+            MinCore((sbyte*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -83,7 +83,7 @@ namespace BurstLinq
         public static short Min(this NativeList<short> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MinCore(source.GetUnsafePtr(), source.Length, out var result);
+            MinCore((short*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -118,7 +118,7 @@ namespace BurstLinq
         public static ushort Min(this NativeList<ushort> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MinCore(source.GetUnsafePtr(), source.Length, out var result);
+            MinCore((ushort*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -153,7 +153,7 @@ namespace BurstLinq
         public static int Min(this NativeList<int> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MinCore(source.GetUnsafePtr(), source.Length, out var result);
+            MinCore((int*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -188,7 +188,7 @@ namespace BurstLinq
         public static uint Min(this NativeList<uint> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MinCore(source.GetUnsafePtr(), source.Length, out var result);
+            MinCore((uint*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -223,7 +223,7 @@ namespace BurstLinq
         public static long Min(this NativeList<long> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MinCore(source.GetUnsafePtr(), source.Length, out var result);
+            MinCore((long*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -258,7 +258,7 @@ namespace BurstLinq
         public static ulong Min(this NativeList<ulong> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MinCore(source.GetUnsafePtr(), source.Length, out var result);
+            MinCore((ulong*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -293,7 +293,7 @@ namespace BurstLinq
         public static float Min(this NativeList<float> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MinCore(source.GetUnsafePtr(), source.Length, out var result);
+            MinCore((float*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -383,7 +383,7 @@ namespace BurstLinq
         public static double Min(this NativeList<double> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MinCore(source.GetUnsafePtr(), source.Length, out var result);
+            MinCore((double*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 

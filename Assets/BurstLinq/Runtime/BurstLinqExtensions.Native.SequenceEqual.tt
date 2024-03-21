@@ -42,7 +42,7 @@ namespace BurstLinq
         public static bool SequenceEqual(this NativeList<<#=type#>> first, NativeList<<#=type#>> second)
         {
             if (first.Length != second.Length) return false;
-            return SequenceEqualCore(first.GetUnsafePtr(), second.GetUnsafePtr(), first.Length);
+            return SequenceEqualCore((<#=type#>*)first.GetUnsafePtr(), (<#=type#>*)second.GetUnsafePtr(), first.Length);
         }
 
         public static bool SequenceEqual(this NativeSlice<<#=type#>> first, NativeSlice<<#=type#>> second)

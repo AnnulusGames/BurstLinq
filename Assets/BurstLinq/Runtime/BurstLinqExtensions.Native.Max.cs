@@ -13,7 +13,7 @@ namespace BurstLinq
         public static byte Max(this NativeList<byte> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MaxCore(source.GetUnsafePtr(), source.Length, out var result);
+            MaxCore((byte*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -48,7 +48,7 @@ namespace BurstLinq
         public static sbyte Max(this NativeList<sbyte> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MaxCore(source.GetUnsafePtr(), source.Length, out var result);
+            MaxCore((sbyte*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -83,7 +83,7 @@ namespace BurstLinq
         public static short Max(this NativeList<short> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MaxCore(source.GetUnsafePtr(), source.Length, out var result);
+            MaxCore((short*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -118,7 +118,7 @@ namespace BurstLinq
         public static ushort Max(this NativeList<ushort> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MaxCore(source.GetUnsafePtr(), source.Length, out var result);
+            MaxCore((ushort*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -153,7 +153,7 @@ namespace BurstLinq
         public static int Max(this NativeList<int> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MaxCore(source.GetUnsafePtr(), source.Length, out var result);
+            MaxCore((int*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -188,7 +188,7 @@ namespace BurstLinq
         public static uint Max(this NativeList<uint> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MaxCore(source.GetUnsafePtr(), source.Length, out var result);
+            MaxCore((uint*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -223,7 +223,7 @@ namespace BurstLinq
         public static long Max(this NativeList<long> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MaxCore(source.GetUnsafePtr(), source.Length, out var result);
+            MaxCore((long*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -258,7 +258,7 @@ namespace BurstLinq
         public static ulong Max(this NativeList<ulong> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MaxCore(source.GetUnsafePtr(), source.Length, out var result);
+            MaxCore((ulong*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -293,7 +293,7 @@ namespace BurstLinq
         public static float Max(this NativeList<float> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MaxCore(source.GetUnsafePtr(), source.Length, out var result);
+            MaxCore((float*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
@@ -384,7 +384,7 @@ namespace BurstLinq
         public static double Max(this NativeList<double> source)
         {
             Error.ThrowIfEmpty(source.Length);
-            MaxCore(source.GetUnsafePtr(), source.Length, out var result);
+            MaxCore((double*)source.GetUnsafePtr(), source.Length, out var result);
             return result;
         }
 
